@@ -1,3 +1,3 @@
-module spark-on-kubernetes-patterns
+module spark-on-kubernetes-recipes
 
 go 1.24

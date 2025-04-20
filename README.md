@@ -1,1 +1,1 @@
-# Spark on Kubernetes Patterns
+# Spark on Kubernetes Recipes
