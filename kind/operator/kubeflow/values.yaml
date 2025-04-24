@@ -362,6 +362,7 @@ spark:
   # Make sure the namespaces have already existed.
   jobNamespaces:
   - default
+  - kubeflow-spark
 
   serviceAccount:
     # -- Specifies whether to create a service account for spark applications.
