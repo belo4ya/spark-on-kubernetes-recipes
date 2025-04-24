@@ -1,0 +1,172 @@
+{{/*
+# Iterate over node types
+*/}}
+{{- range $node := .Values.nodes }}
+
+{{/*
+# Get the node type definition if it exists in .Values.nodeTypes
+*/}}
+{{- $nodeType := dict }}
+{{- if hasKey $.Values.nodeTypes $node.type }}
+  {{- $nodeType = deepCopy (index $.Values.nodeTypes $node.type) }}
+{{- end }}
+
+{{/*
+# Merge resources from node type and node-specific values
+*/}}
+{{- $resources := dict }}
+{{- if hasKey $nodeType "resources" }}
+  {{- $resources = deepCopy $nodeType.resources }}
+{{- end }}
+{{- if hasKey $node "resources" }}
+  {{- $resources = mergeOverwrite $resources $node.resources }}
+{{- end }}
+
+{{/*
+# Merge taints from node type and node-specific values
+*/}}
+{{- $taints := list }}
+{{- if hasKey $nodeType "taints" }}
+  {{- $taints = deepCopy $nodeType.taints }}
+{{- end }}
+{{- if hasKey $node "taints" }}
+  {{- $taints = concat $taints $node.taints }}
+{{- end }}
+
+{{/*
+# Merge annotations from node type and node-specific values
+*/}}
+{{- $annotations := dict }}
+{{- if hasKey $nodeType "annotations" }}
+  {{- $annotations = deepCopy $nodeType.annotations }}
+{{- end }}
+{{- if hasKey $node "annotations" }}
+  {{- $annotations = mergeOverwrite $annotations $node.annotations }}
+{{- end }}
+
+{{/*
+# Merge labels from node type and node-specific values
+*/}}
+{{- $labels := dict }}
+{{- if hasKey $nodeType "labels" }}
+  {{- $labels = deepCopy $nodeType.labels }}
+{{- end }}
+{{- if hasKey $node "labels" }}
+  {{- $labels = mergeOverwrite $labels $node.labels }}
+{{- end }}
+
+{{/*
+# Merge conditions from node type and node-specific values
+*/}}
+{{- $conditions := list }}
+{{- if hasKey $nodeType "conditions" }}
+  {{- $conditions = deepCopy $nodeType.conditions }}
+{{- end }}
+{{- if hasKey $node "conditions" }}
+  {{- $conditions = concat $conditions $node.conditions }}
+{{- end }}
+
+{{/*
+# Merge images from node type and node-specific values
+*/}}
+{{- $images := list }}
+{{- if hasKey $nodeType "images" }}
+  {{- $images = deepCopy $nodeType.images }}
+{{- end }}
+{{- if hasKey $node "images" }}
+  {{- $images = concat $images $node.images }}
+{{- end }}
+
+{{- $count := ($node.count | int) }}
+{{- range $i := until $count }}
+{{/*
+# Generate a more structured name with index padded to 5 digits
+*/}}
+{{- $nodeName := printf "%s-%05d-%s" $node.type $i (randAlphaNum 6 | lower) }}
+{{- if hasKey $node "namePrefix" }}
+  {{- $nodeName = printf "%s-%05d-%s%s" $node.namePrefix $i (randAlphaNum 6 | lower) $node.nameSuffix }}
+{{- end }}
+---
+apiVersion: v1
+kind: Node
+metadata:
+  annotations:
+    node.alpha.kubernetes.io/ttl: "0"
+    kwok.x-k8s.io/node: fake
+    {{- with $annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: {{ $nodeName }}
+    kubernetes.io/os: linux
+    {{- if hasKey $nodeType "role" }}
+    kubernetes.io/role: {{ $nodeType.role }}
+    "node-role.kubernetes.io/{{ $nodeType.role }}": {{ $nodeType.role }}
+    {{ else }}
+    kubernetes.io/role: "agent"
+    "node-role.kubernetes.io/agent": "agent"
+    {{- end }}
+    type: kwok
+    {{- with $labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  name: {{ $nodeName }}
+spec:
+  taints:
+    - effect: NoSchedule
+      key: "kwok.x-k8s.io/node"
+      value: "fake"
+    {{- with $taints }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+status:
+  allocatable:
+    {{- with $resources }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  capacity:
+    {{- with $resources }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  conditions:
+    - message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - message: kubelet is posting ready status. AppArmor enabled
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    {{- with $conditions }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+
+  {{- with $images }}
+  images:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  nodeInfo:
+    architecture: amd64
+    bootID: ""
+    containerRuntimeVersion: ""
+    kernelVersion: ""
+    kubeProxyVersion: fake
+    kubeletVersion: fake
+    machineID: ""
+    operatingSystem: linux
+    osImage: ""
+    systemUUID: ""
+  phase: Running
+{{- end }}
+{{- end }}
