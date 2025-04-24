@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fio-test-scripts
+data:
+  fio-test-all.sh: |
+    #!/bin/sh
+    set -eu
+
+    MOUNT_POINT="$1"   # e.g. /mnt/test
+    FILE="$MOUNT_POINT/testfile.bin"
+    SIZE="1G"
+    DIRECT=1
+    IOENGINE="libaio"
+    RUNTIME=120
+    ETA="--eta-newline=1"
+    GROUP="--group_reporting"
+
+    # POSIX-compatible list of tests: name rw bs iodepth numjobs
+    TESTS="
+    writeio write 4k 96 4
+    randwrite randwrite 4k 96 1
+    writebw write 4M 32 1
+    readio read 4k 128 8
+    readbw read 4M 32 1
+    randread randread 4k 16 8
+    "
+
+    echo "$TESTS" | while read name rw bs iodepth numjobs; do
+      # skip empty lines
+      [ -z "$name" ] && continue
+      echo "=== Running $name (rw=$rw, bs=$bs, iodepth=$iodepth, numjobs=$numjobs) ==="
+      fio \
+        --name="$name" \
+        --filename="$FILE" \
+        --filesize="$SIZE" \
+        --direct="$DIRECT" \
+        --rw="$rw" \
+        --bs="$bs" \
+        --ioengine="$IOENGINE" \
+        --iodepth="$iodepth" \
+        --runtime="$RUNTIME" \
+        --numjobs="$numjobs" \
+        --time_based \
+        $GROUP \
+        $ETA
+      echo
+    done
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fio-test-pvc-pvc-network-ssd-4
+spec:
+  template:
+    spec:
+      containers:
+        - name: fio
+          image: mayadata/fio:latest
+          command: [ "sh", "/scripts/fio-test-all.sh", "/mnt/test" ]
+          volumeMounts:
+            - name: test-volume
+              mountPath: /mnt/test
+            - name: script-volume
+              mountPath: /scripts
+              readOnly: true
+      restartPolicy: Never
+      volumes:
+        - name: test-volume
+          persistentVolumeClaim:
+            claimName: pvc-network-ssd-4
+        - name: script-volume
+          configMap:
+            name: fio-test-scripts
+            defaultMode: 0755
+  backoffLimit: 1
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fio-test-pvc-pvc-network-ssd-16
+spec:
+  template:
+    spec:
+      containers:
+        - name: fio
+          image: mayadata/fio:latest
+          command: [ "sh", "/scripts/fio-test-all.sh", "/mnt/test" ]
+          volumeMounts:
+            - name: test-volume
+              mountPath: /mnt/test
+            - name: script-volume
+              mountPath: /scripts
+              readOnly: true
+      restartPolicy: Never
+      volumes:
+        - name: test-volume
+          persistentVolumeClaim:
+            claimName: pvc-network-ssd-16
+        - name: script-volume
+          configMap:
+            name: fio-test-scripts
+            defaultMode: 0755
+  backoffLimit: 1
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fio-test-pvc-pvc-network-ssd-256
+spec:
+  template:
+    spec:
+      containers:
+        - name: fio
+          image: mayadata/fio:latest
+          command: [ "sh", "/scripts/fio-test-all.sh", "/mnt/test" ]
+          volumeMounts:
+            - name: test-volume
+              mountPath: /mnt/test
+            - name: script-volume
+              mountPath: /scripts
+              readOnly: true
+      restartPolicy: Never
+      volumes:
+        - name: test-volume
+          persistentVolumeClaim:
+            claimName: pvc-network-ssd-256
+        - name: script-volume
+          configMap:
+            name: fio-test-scripts
+            defaultMode: 0755
+  backoffLimit: 1
