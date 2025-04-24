@@ -973,7 +973,7 @@ prometheus-node-exporter:
               regex: "/var/lib/kubelet/pods.+"
 # -- kube-state-metrics dependency chart configuration. For possible values check [here](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml)
 kube-state-metrics:
-  enabled: true
+  enabled: false
   # -- [Scrape configuration](https://docs.victoriametrics.com/operator/api#vmservicescrapespec) for Kube State Metrics
   vmScrape:
     enabled: true
@@ -992,7 +992,7 @@ kube-state-metrics:
 
 # -- Component scraping the kubelets
 kubelet:
-  enabled: true
+  enabled: false
   vmScrapes:
     # -- Enable scraping /metrics/cadvisor from kubelet's service
     cadvisor:
@@ -1083,9 +1083,9 @@ kubeControllerManager:
     # -- Create service for kube controller manager metrics scraping
     enabled: true
     # -- Kube controller manager service port
-    port: 10257
+    port: 10252
     # -- Kube controller manager service target port
-    targetPort: 10257
+    targetPort: 10252
     # -- Kube controller manager service pod selector
     selector:
       component: kube-controller-manager
@@ -1102,7 +1102,7 @@ kubeControllerManager:
           # bearerTokenSecret:
           #   key: ""
           port: http-metrics
-          scheme: https
+          scheme: http
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             serverName: kubernetes
@@ -1178,9 +1178,9 @@ kubeEtcd:
     # -- Enable service for ETCD metrics scraping
     enabled: true
     # -- ETCD service port
-    port: 2379
+    port: 2381
     # -- ETCD service target port
-    targetPort: 2379
+    targetPort: 2381
     # -- ETCD service pods selector
     selector:
       component: etcd
@@ -1196,7 +1196,7 @@ kubeEtcd:
           # bearerTokenSecret:
           #   key: ""
           port: http-metrics
-          scheme: https
+          scheme: http
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
@@ -1216,9 +1216,9 @@ kubeScheduler:
     # -- Enable service for KubeScheduler metrics scrape
     enabled: true
     # -- KubeScheduler service port
-    port: 10259
+    port: 10251
     # -- KubeScheduler service target port
-    targetPort: 10259
+    targetPort: 10251
     # -- KubeScheduler service pod selector
     selector:
       component: kube-scheduler
@@ -1234,14 +1234,14 @@ kubeScheduler:
           # bearerTokenSecret:
           #   key: ""
           port: http-metrics
-          scheme: https
+          scheme: http
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 # Component scraping kube proxy
 kubeProxy:
   # -- Enable kube proxy metrics scraping
-  enabled: false
+  enabled: true
 
   # -- If your kube proxy is not deployed as a pod, specify IPs it can be found on
   endpoints: []
@@ -1271,7 +1271,7 @@ kubeProxy:
           # bearerTokenSecret:
           #   key: ""
           port: http-metrics
-          scheme: https
+          scheme: http
           tlsConfig:
             caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 

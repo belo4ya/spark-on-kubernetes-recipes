@@ -1,7 +1,7 @@
 ```shell
 kind create cluster --config config.yaml && kubectx kind-v31
 
-helm upgrade --install vmoperator vm/victoria-metrics-operator \
+helm upgrade --install vmks vm/victoria-metrics-k8s-stack \
     -n vm --create-namespace \
     -f vm/values.yaml
 
