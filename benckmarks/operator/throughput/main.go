@@ -8,10 +8,10 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
-	"github.com/samber/lo"
 	"github.com/sourcegraph/conc/pool"
 	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
@@ -47,9 +47,15 @@ func main() {
 	ctx, cancel := context.WithTimeout(signals.SetupSignalHandler(), time.Duration(*flagTimeout)*time.Second)
 	defer cancel()
 
-	k8sClient := lo.Must(client.New(ctrl.GetConfigOrDie(), client.Options{Scheme: scheme}))
+	k8sClient, err := client.New(ctrl.GetConfigOrDie(), client.Options{Scheme: scheme})
+	if err != nil {
+		log.Fatal(fmt.Errorf("client.New: %w", err))
+	}
 
-	data := lo.Must(os.ReadFile(*flagTmpl))
+	data, err := os.ReadFile(*flagTmpl)
+	if err != nil {
+		log.Fatal(fmt.Errorf("os.ReadFile: %w", err))
+	}
 	tmpl := template.Must(template.New("").Parse(string(data)))
 
 	start := make(chan struct{})
@@ -87,8 +93,13 @@ func GenerateLoad(ctx context.Context, k8sClient client.Client, tmpl *template.T
 
 	for i := range *flagN {
 		p.Go(func(ctx context.Context) error {
-			obj := lo.Must(ObjectFormTemplate(tmpl, i))
-			lo.Must0(k8sClient.Create(ctx, obj))
+			obj, err := objectFormTemplate(tmpl, i)
+			if err != nil {
+				return fmt.Errorf("objectFormTemplate: %w", err)
+			}
+			if err := k8sClient.Create(ctx, obj); err != nil {
+				return fmt.Errorf("k8sClient.Create: %w", err)
+			}
 			log.Printf("[%04d/%04d] created resource %s/%s\n", i+1, *flagN, obj.GetNamespace(), obj.GetName())
 			return nil
 		})
@@ -111,13 +122,19 @@ func MonitorBenchmark(ctx context.Context, tmpl *template.Template, start chan<-
 	stop := make(chan struct{})
 	defer close(stop)
 
-	obj := lo.Must(ObjectFormTemplate(tmpl, 1))
+	obj, err := objectFormTemplate(tmpl, 1)
+	if err != nil {
+		return fmt.Errorf("objectFormTemplate: %w", err)
+	}
+
+	clientset := kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie())
 	informers_ := informers.NewSharedInformerFactoryWithOptions(
-		kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie()),
+		clientset,
 		10*time.Hour,
 		informers.WithNamespace(obj.GetNamespace()),
 	)
-	lo.Must(informers_.Core().V1().Pods().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+
+	_, err = informers_.Core().V1().Pods().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(_ any) {
 			mu.Lock()
 			pods := rows[len(rows)-1].pods + 1
@@ -128,7 +145,10 @@ func MonitorBenchmark(ctx context.Context, tmpl *template.Template, start chan<-
 			}
 			mu.Unlock()
 		},
-	}))
+	})
+	if err != nil {
+		return fmt.Errorf("informers_.AddEventHandler: %w", err)
+	}
 
 	informers_.Start(ctx.Done())
 	startTime = time.Now().UTC()
@@ -140,7 +160,7 @@ func MonitorBenchmark(ctx context.Context, tmpl *template.Template, start chan<-
 	case <-stop:
 	}
 
-	f, err := os.Create(fmt.Sprintf("throughput-result-%s.csv", startTime.Format("20060102-150405")))
+	f, err := os.Create(fmt.Sprintf("throughput-result-%s-%s.csv", filepath.Base(*flagTmpl), startTime.Format("20060102-150405")))
 	if err != nil {
 		return fmt.Errorf("os.Create: %w", err)
 	}
@@ -158,10 +178,10 @@ func MonitorBenchmark(ctx context.Context, tmpl *template.Template, start chan<-
 	return nil
 }
 
-func ObjectFormTemplate(tmpl *template.Template, i int) (client.Object, error) {
+func objectFormTemplate(tmpl *template.Template, i int) (client.Object, error) {
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, map[string]any{"Index": fmt.Sprintf("%04d", i)}); err != nil {
-		return nil, fmt.Errorf("tmpl.Execute: %v", err)
+		return nil, fmt.Errorf("tmpl.Execute: %w", err)
 	}
 	obj := &unstructured.Unstructured{}
 	decoder := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
