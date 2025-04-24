@@ -30,9 +30,8 @@ var (
 )
 
 func init() {
-	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-
 	flag.Parse()
+	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 }
 
 func main() {
