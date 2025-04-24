@@ -1,19 +1,32 @@
 apiVersion: spark.apache.org/v1alpha1
 kind: SparkApplication
 metadata:
-  name: pi
-  namespace: default
+  name: "pi-{{ .Index }}"
+  namespace: "apache-spark"
 spec:
   mainClass: "org.apache.spark.examples.SparkPi"
   jars: "local:///opt/spark/examples/jars/spark-examples.jar"
   sparkConf:
-    spark.dynamicAllocation.enabled: "true"
-    spark.dynamicAllocation.shuffleTracking.enabled: "true"
-    spark.dynamicAllocation.maxExecutors: "3"
     spark.kubernetes.authenticate.driver.serviceAccountName: "spark"
     spark.kubernetes.container.image: "apache/spark:4.0.0-preview2"
+    spark.executor.instances: "1"
+    spark.driver.cores: "1"
+    spark.driver.memory: "512m"
   applicationTolerations:
     resourceRetainPolicy: Always
   runtimeVersions:
     scalaVersion: "2.13"
     sparkVersion: "4.0.0-preview2"
+
+  driverSpec:
+    podTemplateSpec:
+      metadata:
+        labels:
+          "pod-complete.stage.kwok.x-k8s.io/completed": "true"
+      spec:
+        nodeSelector:
+          type: "kwok"
+        tolerations:
+          - effect: "NoSchedule"
+            key: "kwok.x-k8s.io/node"
+            operator: "Exists"
