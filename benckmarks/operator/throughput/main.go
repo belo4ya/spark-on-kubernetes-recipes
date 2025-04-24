@@ -13,6 +13,7 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/sourcegraph/conc/pool"
+	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -25,15 +26,15 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 var (
 	scheme = runtime.NewScheme()
 
-	flagTmpl = flag.String("tmpl", "", "")
-	flagN    = flag.Int("n", 1, "")
-	flagP    = flag.Int("p", 2, "")
+	flagTmpl    = flag.String("tmpl", "", "")
+	flagN       = flag.Int("n", 1, "")
+	flagP       = flag.Int("p", 2, "")
+	flagTimeout = flag.Int("timeout", 30, "")
 )
 
 func init() {
@@ -43,75 +44,51 @@ func init() {
 }
 
 func main() {
-	ctx := signals.SetupSignalHandler()
+	ctx, cancel := context.WithTimeout(signals.SetupSignalHandler(), time.Duration(*flagTimeout)*time.Second)
+	defer cancel()
+
 	k8sClient := lo.Must(client.New(ctrl.GetConfigOrDie(), client.Options{Scheme: scheme}))
 
-	// Determine namespace from template
-	namespace := extractNamespace()
-
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	// Start generator
-	go func() {
-		defer wg.Done()
-		err := generateLoad(ctx, k8sClient)
-		if err != nil {
-			log.Fatalf("Error generating load: %v", err)
-		}
-	}()
-
-	// Start monitoring
-	go func() {
-		defer wg.Done()
-		err := monitorBenchmark(ctx, k8sClient, namespace, *flagN)
-		if err != nil {
-			log.Fatalf("Error monitoring benchmark: %v", err)
-		}
-	}()
-
-	wg.Wait()
-	log.Println("Benchmark complete")
-}
-
-// extractNamespace extracts the namespace from the template file for monitoring
-func extractNamespace() string {
 	data := lo.Must(os.ReadFile(*flagTmpl))
-	obj := &unstructured.Unstructured{}
-	decoder := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
-	_, _, err := decoder.Decode(data, nil, obj)
-	if err != nil {
-		log.Fatalf("Failed to decode template to extract namespace: %v", err)
+	tmpl := template.Must(template.New("").Parse(string(data)))
+
+	start := make(chan struct{})
+	defer close(start)
+
+	eg, ctx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		err := MonitorBenchmark(ctx, tmpl, start)
+		if err != nil {
+			return fmt.Errorf("MonitorBenchmark: %w", err)
+		}
+		return nil
+	})
+	eg.Go(func() error {
+		err := GenerateLoad(ctx, k8sClient, tmpl, start)
+		if err != nil {
+			return fmt.Errorf("GenerateLoad: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		log.Fatal(err)
 	}
-	namespace := obj.GetNamespace()
-	if namespace == "" {
-		namespace = "default"
-	}
-	return namespace
 }
 
-// generateLoad creates resources based on the template
-func generateLoad(ctx context.Context, k8sClient client.Client) error {
+// GenerateLoad creates resources based on the template
+func GenerateLoad(ctx context.Context, k8sClient client.Client, tmpl *template.Template, start <-chan struct{}) error {
+	<-start
 	p := pool.New().
 		WithContext(ctx).
 		WithMaxGoroutines(*flagP).
 		WithCancelOnError().
 		WithFirstError()
 
-	data := lo.Must(os.ReadFile(*flagTmpl))
-	tmpl := template.Must(template.New("").Parse(string(data)))
-
 	for i := range *flagN {
 		p.Go(func(ctx context.Context) error {
-			var buf bytes.Buffer
-			lo.Must0(tmpl.Execute(&buf, map[string]any{"Index": fmt.Sprintf("%04d", i)}))
-
-			obj := &unstructured.Unstructured{}
-			decoder := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
-			lo.Must2(decoder.Decode(buf.Bytes(), nil, obj))
-
+			obj := lo.Must(ObjectFormTemplate(tmpl, i))
 			lo.Must0(k8sClient.Create(ctx, obj))
-
 			log.Printf("[%04d/%04d] created resource %s/%s\n", i+1, *flagN, obj.GetNamespace(), obj.GetName())
 			return nil
 		})
@@ -120,94 +97,76 @@ func generateLoad(ctx context.Context, k8sClient client.Client) error {
 	return p.Wait()
 }
 
-// monitorBenchmark watches for pod creations and records metrics
-func monitorBenchmark(ctx context.Context, k8sClient client.Client, namespace string, expectedCount int) error {
-	startTime := time.Now()
-	resultFile := fmt.Sprintf("benchmark-results-%s.csv", time.Now().Format("20060102-150405"))
+// MonitorBenchmark watches for pod creations and records metrics
+func MonitorBenchmark(ctx context.Context, tmpl *template.Template, start chan<- struct{}) error {
+	var startTime time.Time
 
-	f, err := os.Create(resultFile)
-	if err != nil {
-		return fmt.Errorf("failed to create results file: %w", err)
+	type Row struct {
+		secs int
+		pods int
 	}
-	defer f.Close()
-
-	// Write header
-	_, err = f.WriteString("time,pods_count\n")
-	if err != nil {
-		return fmt.Errorf("failed to write header: %w", err)
-	}
-
-	podCount := 0
+	rows := []Row{{secs: 0, pods: 0}}
 	var mu sync.Mutex
 
-	informers_ := informers.NewSharedInformerFactory(kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie()), 10*time.Hour)
-	informers_.Core().V1().Pods().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj any) {
-
-		},
-		UpdateFunc: nil,
-		DeleteFunc: nil,
-	})
-
-	// Setup informer
-	informer, err := k8sClient.Scheme().New(corev1.SchemeGroupVersion.WithKind("Pod"))
-	if err != nil {
-		return fmt.Errorf("failed to create pod object: %w", err)
-	}
-
-	podWatcher, err := source.NewKindWithCache(informer.(*corev1.Pod), cache.WatchFunc(func(options cache.ListOptions) (runtime.Object, error) {
-		podList := &corev1.PodList{}
-		err := k8sClient.List(ctx, podList, &client.ListOptions{Namespace: namespace})
-		return podList, err
-	}))
-	if err != nil {
-		return fmt.Errorf("failed to create pod watcher: %w", err)
-	}
-
-	// Watch for pod creations
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go func() {
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.Tick():
-				mu.Lock()
-				elapsed := time.Since(startTime).Seconds()
-				_, err := f.WriteString(fmt.Sprintf("%.2f,%d\n", elapsed, podCount))
-				if err != nil {
-					log.Printf("Error writing to results file: %v", err)
-				}
-				mu.Unlock()
-
-				if podCount >= expectedCount {
-					log.Printf("Benchmark complete: %d/%d pods created", podCount, expectedCount)
-					return
-				}
-			}
-		}
-	}()
-
-	// Setup handler for pod events
-	_, err = podWatcher.Start(ctx, cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			pod := obj.(*corev1.Pod)
+	obj := lo.Must(ObjectFormTemplate(tmpl, 1))
+	informers_ := informers.NewSharedInformerFactoryWithOptions(
+		kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie()),
+		10*time.Hour,
+		informers.WithNamespace(obj.GetNamespace()),
+	)
+	lo.Must(informers_.Core().V1().Pods().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(_ any) {
 			mu.Lock()
-			podCount++
-			log.Printf("Pod created: %s (%d/%d)", pod.Name, podCount, expectedCount)
+			pods := rows[len(rows)-1].pods + 1
+			rows = append(rows, Row{secs: int(time.Since(startTime).Seconds()), pods: pods})
+			fmt.Println(pods)
+			if pods >= *flagN {
+				stop <- struct{}{}
+			}
 			mu.Unlock()
 		},
-	})
-	if err != nil {
-		return fmt.Errorf("failed to start pod watcher: %w", err)
+	}))
+
+	informers_.Start(ctx.Done())
+	startTime = time.Now().UTC()
+	start <- struct{}{}
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-stop:
 	}
 
-	// Wait until all pods are created or context is canceled
-	<-ctx.Done()
+	f, err := os.Create(fmt.Sprintf("throughput-result-%s.csv", startTime.Format("20060102-150405")))
+	if err != nil {
+		return fmt.Errorf("os.Create: %w", err)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString("secs,pods\n"); err != nil {
+		return fmt.Errorf("f.WriteString: %w", err)
+	}
+	for _, row := range rows {
+		if _, err = f.WriteString(fmt.Sprintf("%d,%d\n", row.secs, row.pods)); err != nil {
+			return fmt.Errorf("f.WriteString: %w", err)
+		}
+	}
+
 	return nil
+}
+
+func ObjectFormTemplate(tmpl *template.Template, i int) (client.Object, error) {
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, map[string]any{"Index": fmt.Sprintf("%04d", i)}); err != nil {
+		return nil, fmt.Errorf("tmpl.Execute: %v", err)
+	}
+	obj := &unstructured.Unstructured{}
+	decoder := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
+	if _, _, err := decoder.Decode(buf.Bytes(), nil, obj); err != nil {
+		return nil, fmt.Errorf("decoder.Decode: %w", err)
+	}
+	return obj, nil
 }
