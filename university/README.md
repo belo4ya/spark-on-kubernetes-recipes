@@ -8,16 +8,28 @@
 
 ## Планировщик
 
-## Dynamic Resource Allocation + Авто-масштабирование
+- производительность
+- фичи (мультенантность, переподписка)
 
-## PVC
+## Spark UI, Spark History Server, VictoriaMetrics, Apache Hive, Run-Centric Registry
 
-## Spark History Server, VictoriaMetrics, Apache Hive, Run-Centric Registry
+## Dynamic Resource Allocation + Переподписка + Авто-масштабирование
 
-## Прерываемые узлы
+## Local Disks, PVC, Remote Shuffle Service
+
+## Авто-масштабирование + Прерываемые узлы
 
 ## Spark Connect
 
 ## Gluten + Velox, Blaze, DataFusion Comet
 
 ## GPU RAPIDS
+
+## IaaC
+
+- GCP +
+- Yandex +
+- Selectel
+- VK
+
+## Сравнения
