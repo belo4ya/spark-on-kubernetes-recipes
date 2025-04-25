@@ -8,11 +8,11 @@
 
 ## Планировщик
 
-## Spark History Server, VictoriaMetrics, Apache Hive, Run-Centric Registry
-
 ## Dynamic Resource Allocation + Авто-масштабирование
 
 ## PVC
+
+## Spark History Server, VictoriaMetrics, Apache Hive, Run-Centric Registry
 
 ## Прерываемые узлы
 
