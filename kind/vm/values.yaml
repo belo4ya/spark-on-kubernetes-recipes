@@ -992,7 +992,7 @@ kube-state-metrics:
 
 # -- Component scraping the kubelets
 kubelet:
-  enabled: false
+  enabled: true
   vmScrapes:
     # -- Enable scraping /metrics/cadvisor from kubelet's service
     cadvisor:

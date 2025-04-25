@@ -34,7 +34,7 @@ var (
 	flagTmpl    = flag.String("tmpl", "", "")
 	flagN       = flag.Int("n", 1, "")
 	flagP       = flag.Int("p", 2, "")
-	flagTimeout = flag.Int("timeout", 30, "")
+	flagTimeout = flag.Int("timeout", 300, "")
 )
 
 func init() {
@@ -139,7 +139,7 @@ func MonitorBenchmark(ctx context.Context, tmpl *template.Template, start chan<-
 			mu.Lock()
 			pods := rows[len(rows)-1].pods + 1
 			rows = append(rows, Row{secs: int(time.Since(startTime).Seconds()), pods: pods})
-			fmt.Println(pods)
+			log.Printf("[%04d/%04d] progress...\n", pods, *flagN)
 			if pods >= *flagN {
 				stop <- struct{}{}
 			}

@@ -30,7 +30,10 @@ operatorDeployment:
     type: Recreate
   operatorPod:
     priorityClassName: null
-    annotations: { }
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "19090"
+      prometheus.io/path: "/prometheus"
     labels: { }
     affinity: { }
     nodeSelector: { }

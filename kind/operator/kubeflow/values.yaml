@@ -109,9 +109,10 @@ controller:
     # key2: value2
 
   # -- Extra annotations for controller pods.
-  annotations: {}
-    # key1: value1
-    # key2: value2
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
 
   # -- Volumes for controller pods.
   volumes:
