@@ -128,7 +128,7 @@ workloadResources:
     overrideWatchedNamespaces: true
     data:
       - "default"
-      - "apache-spark"
+      - "apache-jobs"
   serviceAccount:
     create: true
     name: "spark"

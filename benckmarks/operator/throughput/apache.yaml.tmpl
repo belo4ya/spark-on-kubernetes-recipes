@@ -2,7 +2,7 @@ apiVersion: spark.apache.org/v1alpha1
 kind: SparkApplication
 metadata:
   name: "pi-{{ .Index }}"
-  namespace: "apache-spark"
+  namespace: "apache-jobs"
 spec:
   mainClass: "org.apache.spark.examples.SparkPi"
   jars: "local:///opt/spark/examples/jars/spark-examples.jar"

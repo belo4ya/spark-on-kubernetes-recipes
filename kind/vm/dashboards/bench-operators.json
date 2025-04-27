@@ -22,6 +22,19 @@
   "links": [],
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "P4169E866C3094E38"
@@ -85,7 +98,7 @@
         "h": 11,
         "w": 9,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 3,
       "interval": "15s",
@@ -113,7 +126,7 @@
             "uid": "P4169E866C3094E38"
           },
           "editorMode": "code",
-          "expr": "rate(container_cpu_usage_seconds_total{pod=~\"spark-kubernetes-operator-.+|kubeflow-spark-operator-controller-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}[$__rate_interval])",
+          "expr": "rate(container_cpu_usage_seconds_total{pod=~\"spark-kubernetes-operator-.+|spark-operator-controller-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}[$__rate_interval])",
           "hide": false,
           "instant": false,
           "legendFormat": "{{namespace}}",
@@ -188,7 +201,7 @@
         "h": 11,
         "w": 9,
         "x": 9,
-        "y": 0
+        "y": 1
       },
       "id": 2,
       "interval": "15s",
@@ -216,13 +229,376 @@
             "uid": "P4169E866C3094E38"
           },
           "editorMode": "code",
-          "expr": "container_memory_working_set_bytes{pod=~\"spark-kubernetes-operator-.+|kubeflow-spark-operator-controller-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}",
+          "expr": "container_memory_working_set_bytes{pod=~\"spark-kubernetes-operator-.+|spark-operator-controller-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}",
           "legendFormat": "{{namespace}}",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Memory usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P4169E866C3094E38"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 9,
+        "x": 0,
+        "y": 12
+      },
+      "id": 4,
+      "interval": "15s",
+      "options": {
+        "legend": {
+          "asTable": true,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "editorMode": "code",
+          "expr": "rate(container_cpu_usage_seconds_total{pod=~\"spark-kubernetes-operator-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}[$__rate_interval]) offset -24m",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{namespace}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "editorMode": "code",
+          "expr": "rate(container_cpu_usage_seconds_total{pod=~\"spark-operator-controller-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}[$__rate_interval])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{namespace}}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "CPU usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P4169E866C3094E38"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 9,
+        "x": 9,
+        "y": 12
+      },
+      "id": 5,
+      "interval": "15s",
+      "options": {
+        "legend": {
+          "asTable": true,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "editorMode": "code",
+          "expr": "container_memory_working_set_bytes{pod=~\"spark-kubernetes-operator-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"} offset -24m",
+          "legendFormat": "{{namespace}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "editorMode": "code",
+          "expr": "container_memory_working_set_bytes{pod=~\"spark-operator-controller-.+\", container!=\"\", metrics_path=\"/metrics/cadvisor\"}",
+          "hide": false,
+          "legendFormat": "{{namespace}}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Memory usage",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 7,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "dejykd4mch0cgc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 9,
+        "x": 0,
+        "y": 24
+      },
+      "id": 8,
+      "interval": "15s",
+      "options": {
+        "legend": {
+          "asTable": true,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "alias": "job-without-dra",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "dejykd4mch0cgc"
+          },
+          "refId": "A",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "0.0,38.032317004538896,43.93165280338992,37.007438100103165,41.53231384219349,36.91785239531353,45.498906685011015,40.340320403219444,44.794250153939544,49.690201316903824,48.70267255315164,48.416607485377476,40.08365973132757,43.89255302940861,39.28416102277042,38.245111267533964,39.23279739478442,37.18932324641661,41.94078571385463,38.643473144652184,40.86886546001292"
+        },
+        {
+          "alias": "job-with-dra",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "dejykd4mch0cgc"
+          },
+          "refId": "B",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "0.0,53.85453163270442,57.21343061140077,57.81754801163055,58.091766566799684,62.95736872651778,30.568318138966355,65.84054639481772,67.03716528391332,70.16304634203242,59.0118344160574,60.95401809194522,30.279452577713737,62.99635337496211,57.69632601441054,55.73867705211294,58.10961661007098,61.56429499500916,0.0,0.0,0.0"
+        },
+        {
+          "alias": "job-with-resource-profiles",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "dejykd4mch0cgc"
+          },
+          "hide": false,
+          "refId": "C",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "0.0,63.226282021927815,71.24841816574963,72.38410004232796,72.75910912007363,87.98427533614552,86.64580916499743,84.37893429300937,75.77695064906122,71.54134266945636,84.70397342167733,74.47539997366836,72.46784310747212,75.71367135692215,0.0,0.0,0.0,0.0,0.0,0.0,0.0"
+        }
+      ],
+      "title": "CPU usage",
       "type": "timeseries"
     }
   ],
@@ -233,12 +609,12 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
-    "to": "now"
+    "from": "2025-04-25T01:04:19.569Z",
+    "to": "2025-04-25T01:27:54.634Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "bench/Operators",
   "uid": "eejx7yw2sw3y8d",
-  "version": 19
+  "version": 27
 }
