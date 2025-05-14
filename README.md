@@ -3,9 +3,10 @@
 > 🚧 UNDER CONSTRUCTION 🚧
 
 **Тема:** Modern, Scalable, Feature-Rich and Cost-Effective Spark on Kubernetes
+
 **Аннотация:**
 
-- Сложный простой Spark на Kubernetes
+- Простой сложный Spark на Kubernetes
 
 - Выбор оператора: популярный [kubeflow/spark-operator](https://github.com/kubeflow/spark-operator) vs
   новый [apache/spark-kubernetes-operator](https://github.com/apache/spark-kubernetes-operator)
