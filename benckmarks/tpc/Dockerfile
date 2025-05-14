@@ -17,7 +17,7 @@ RUN wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoo
 
 WORKDIR /opt/tpc-benchmark
 
-ARG AWS_ACCESS_KEY_ID
+ARG AWS_ACCESS_KEY_ID=90944e28e308450a98dbecc9eae1c0ef
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_ENDPOINT_URL=https://s3.ru-7.storage.selcloud.ru
 ARG S3_BUCKET=spark-benchmark
@@ -39,5 +39,9 @@ RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
 ENV TPCH_DISTS_DSS=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/dists.dss
 ENV TPCH_DSS_QUERY=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/queries
 ENV DSS_QUERY=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/queries
+
+
+# TPC-DS
+# make LINUX_CFLAGS='-g -Wall -fcommon'
 
 ENTRYPOINT ["/bin/bash"]
