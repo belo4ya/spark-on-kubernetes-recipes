@@ -1,0 +1,17 @@
+global:
+  gc: true                      # Garbage collection
+jobs:
+  - name: create-jobs       # job name
+    namespace: spark-jobs  # namespace prefix
+    jobIterations: 1            # number of job iterations
+    qps: 1000                       # API request rate
+    burst: 5
+    namespacedIterations: false   # Create a new namespace per job iteration
+    waitWhenFinished: true       # Wait for pods to be running before finishing the job
+    cleanup: true                # Cleanup resources from previous runs
+    objects:
+      - objectTemplate: templates/job-volcano.yaml
+        replicas: 2000
+        inputVars:
+          podReplicas: 1
+          image: quay.io/cloud-bulldozer/nginx:latest
