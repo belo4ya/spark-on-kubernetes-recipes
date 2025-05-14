@@ -1,0 +1,5 @@
+*.zip
+data/
+
+tpc-h/tpc-h-tool-v3.0.1/
+tpc-ds/tpc-ds-tool-v4.0.0/
