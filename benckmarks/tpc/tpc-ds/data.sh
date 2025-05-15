@@ -4,11 +4,13 @@ DGEN_EXEC=${DGEN_EXEC:-dsdgen}
 OUT_DIR=${OUT_DIR:-./data}
 SF=${SF:-1}
 PARALLEL=${PARALLEL:-8}
+PART=${PART:-$PARALLEL}
+echo $PART
 
 out_dir="$OUT_DIR/sf$SF/csv"
 mkdir -p "$out_dir"
 
-for i in $(seq 1 "$PARALLEL"); do
+for i in $(seq 1 "$PART"); do
   $DGEN_EXEC -force -distributions "$TPCDS_DISTRIBUTIONS" -scale "$SF" -dir "$out_dir" -parallel "$PARALLEL" -child "$i" &
 done
 
