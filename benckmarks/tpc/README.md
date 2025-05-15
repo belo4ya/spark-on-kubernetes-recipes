@@ -3,6 +3,7 @@
 ```shell
 export AWS_SECRET_ACCESS_KEY=
 docker build --build-arg=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0 .
+docker buildx build --platform=linux/amd64,linux/arm64 --build-arg=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0 .
 
 docker push belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0
 ```
@@ -11,6 +12,8 @@ docker push belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0
 docker run --rm -it -v ./../:/opt/tpc-benchmark/spark-on-kubernetes-recipes/benckmarks belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0
 
 docker run --rm -it belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0
+
+docker run -it -v ./spark-on-kubernetes-recipes:/opt/tpc-benchmark/spark-on-kubernetes-recipes --name spark-tpc-benchmark-tools belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0
 ```
 
 ```shell
@@ -25,17 +28,18 @@ cd spark-on-kubernetes-recipes/benckmarks/tpc/
 cd tpc-h
 
 # 10Gi
-SF=10 PARALLEL=10 ./data.sh
+SF=10 PARALLEL=24 ./data.sh
 # 100Gi
-SF=100 PARALLEL=10 ./data.sh
+SF=100 PARALLEL=24 ./data.sh
 # 300Gi
-SF=300 PARALLEL=10 ./data.sh
+SF=300 PARALLEL=24 ./data.sh
 # 1Ti
-SF=1000 PARALLEL=10 ./data.sh
+SF=1000 PARALLEL=24 ./data.sh
 ```
 
 ```shell
 export BENCHMARK=tpc-h
+
 # 10Gi
 MODE=csv-parquet SRC_PATH=./tpc-h/data/sf10/csv DST_PATH=spark-benchmark/tpc-h/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
 # 100Gi
@@ -52,17 +56,18 @@ MODE=parquet SRC_PATH=./tpc-h/data/sf1000/csv PARQUET_DST_PATH=spark-benchmark/t
 cd tpc-ds
 
 # 10Gi
-SF=100 PARALLEL=10 PART=1 ./data.sh
+SF=100 PARALLEL=100 PART=10 ./data.sh && mv ./data/sf100 ./data/sf10
 # 100Gi
-SF=100 PARALLEL=10 ./data.sh
+SF=100 PARALLEL=24 ./data.sh
 # 300Gi
-SF=300 PARALLEL=10 ./data.sh
+SF=300 PARALLEL=24 ./data.sh
 # 1Ti
-SF=1000 PARALLEL=10 ./data.sh
+SF=1000 PARALLEL=24 ./data.sh
 ```
 
 ```shell
 export BENCHMARK=tpc-ds
+
 # 10Gi
 MODE=csv-parquet SRC_PATH=./tpc-ds/data/sf10/csv DST_PATH=spark-benchmark/tpc-ds/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh
 # 100Gi

@@ -10,7 +10,7 @@ out_dir="$OUT_DIR/sf$SF/csv"
 mkdir -p "$out_dir"
 
 for i in $(seq 1 "$PART"); do
-  $DGEN_EXEC -force -distributions "$TPCDS_DISTRIBUTIONS" -scale "$SF" -dir "$out_dir" -parallel "$PARALLEL" -child "$i" &
+  $DGEN_EXEC -quiet Y -force -distributions "$TPCDS_DISTRIBUTIONS" -scale "$SF" -dir "$out_dir" -parallel "$PARALLEL" -child "$i" &
 done
 
 wait

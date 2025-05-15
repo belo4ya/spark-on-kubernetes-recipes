@@ -7,12 +7,12 @@ PARALLEL=${PARALLEL:-8}
 
 # all tables except lineitem.tbl
 for tbl in c n O P r s S; do
-  $DGEN_EXEC -f -b "$TPCH_DISTS_DSS" -s "$SF" -T $tbl &
+  $DGEN_EXEC -q -f -b "$TPCH_DISTS_DSS" -s "$SF" -T $tbl &
 done
 
 # lineitem.tbl
 for i in $(seq 1 "$PARALLEL"); do
-  $DGEN_EXEC -f -b "$TPCH_DISTS_DSS" -s "$SF" -C "$PARALLEL" -S "$i" -T L &
+  $DGEN_EXEC -q -f -b "$TPCH_DISTS_DSS" -s "$SF" -C "$PARALLEL" -S "$i" -T L &
 done
 
 wait

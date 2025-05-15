@@ -1,0 +1,17 @@
+#cloud-config
+
+write_files:
+- path: "/opt/containers/docker-compose.yaml"
+  permissions: "0644"
+  content: |
+    version: "3.9"
+    name: spark-tpc-benchmark-tools
+    services:
+      spark-tpc-benchmark-tools:
+        container_name: spark-tpc-benchmark-tools
+        image: "belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0"
+
+- path: "/opt/gomplate/values/user-values.yaml"
+  permissions: "0644"
+  content: |
+    portainer_password: "admin"
