@@ -8,7 +8,7 @@ PARALLEL=${PARALLEL:-8}
 out_dir="$OUT_DIR/sf$SF/csv"
 mkdir -p "$out_dir"
 
-for i in $(seq 1 2); do
+for i in $(seq 1 "$PARALLEL"); do
   $DGEN_EXEC -force -distributions "$TPCDS_DISTRIBUTIONS" -scale "$SF" -dir "$out_dir" -parallel "$PARALLEL" -child "$i" &
 done
 
@@ -19,7 +19,6 @@ pushd "$out_dir" > /dev/null || exit 1
 
 tables=$(ls *_*_[0-9]*.dat 2>/dev/null | sed -E 's/_[0-9]+_[0-9]+\.dat$//' | sort -u)
 for tbl in $tables; do
-  echo "Combining chunks for '$tbl' → ${tbl}.dat"
   cat "${tbl}"_[0-9]*_[0-9]*.dat > "${tbl}.dat"
   rm -f "${tbl}"_[0-9]*_[0-9]*.dat
 done
