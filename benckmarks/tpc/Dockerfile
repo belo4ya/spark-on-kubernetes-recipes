@@ -27,7 +27,7 @@ ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ENV S3_BUCKET=${S3_BUCKET}
 
-# Download and compile TPC-H tools
+# TPC-H
 RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
            s3 cp s3://${S3_BUCKET}/tpc-h/tpc-h-tool-v3.0.1.zip . \
     && unzip tpc-h-tool-v3.0.1.zip \
@@ -38,10 +38,17 @@ RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
 
 ENV TPCH_DISTS_DSS=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/dists.dss
 ENV TPCH_DSS_QUERY=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/queries
-ENV DSS_QUERY=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/queries
-
+ENV DSS_QUERY=${TPCH_DSS_QUERY}
 
 # TPC-DS
-# make LINUX_CFLAGS='-g -Wall -fcommon'
+RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
+           s3 cp s3://${S3_BUCKET}/tpc-ds/tpc-ds-tool-v4.0.0.zip . \
+    && unzip tpc-ds-tool-v4.0.0.zip \
+    && cd tpc-ds-tool-v4.0.0/tools \
+    && make LINUX_CFLAGS='-g -Wall -fcommon' \
+    && chmod +x dsdgen dsqgen \
+    && cp dsdgen dsqgen /usr/local/bin/
+
+ENV TPCDS_DISTRIBUTIONS=/opt/tpc-benchmark/tpc-ds-tool-v4.0.0/tools/tpcds.idx
 
 ENTRYPOINT ["/bin/bash"]
