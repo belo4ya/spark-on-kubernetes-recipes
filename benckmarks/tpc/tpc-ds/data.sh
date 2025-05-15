@@ -5,7 +5,6 @@ OUT_DIR=${OUT_DIR:-./data}
 SF=${SF:-1}
 PARALLEL=${PARALLEL:-8}
 PART=${PART:-$PARALLEL}
-echo $PART
 
 out_dir="$OUT_DIR/sf$SF/csv"
 mkdir -p "$out_dir"
