@@ -28,21 +28,21 @@ cd spark-on-kubernetes-recipes/benckmarks/tpc/
 cd tpc-h
 
 # 10Gi
-SF=10 PARALLEL=24 ./data.sh
+SF=10 PARALLEL=32 ./data.sh
 # 100Gi
-SF=100 PARALLEL=24 ./data.sh
+SF=100 PARALLEL=32 ./data.sh
 # 300Gi
-SF=300 PARALLEL=24 ./data.sh
+SF=300 PARALLEL=32 ./data.sh
 # 1Ti
-SF=1000 PARALLEL=24 ./data.sh
+SF=1000 PARALLEL=32 ./data.sh
 ```
 
 ```shell
 export BENCHMARK=tpc-h
-export SPARK_WORKERS=16
+export SPARK_WORKERS=30
 
 # 10Gi
-MODE=csv-parquet SRC_PATH=./tpc-h/data/sf10/csv DST_PATH=spark-benchmark/tpc-h/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
+MODE=parquet SRC_PATH=./tpc-h/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
 # 100Gi
 MODE=parquet SRC_PATH=./tpc-h/data/sf100/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf100/parquet ./to-s3.sh
 # 300Gi
@@ -59,19 +59,19 @@ cd tpc-ds
 # 10Gi
 SF=100 PARALLEL=200 PART=20 ./data.sh && mv ./data/sf100 ./data/sf10
 # 100Gi
-SF=100 PARALLEL=24 ./data.sh
+SF=100 PARALLEL=32 ./data.sh
 # 300Gi
-SF=300 PARALLEL=24 ./data.sh
+SF=300 PARALLEL=32 ./data.sh
 # 1Ti
-SF=1000 PARALLEL=24 ./data.sh
+SF=1000 PARALLEL=32 ./data.sh
 ```
 
 ```shell
 export BENCHMARK=tpc-ds
-export SPARK_WORKERS=16
+export SPARK_WORKERS=30
 
 # 10Gi
-MODE=csv-parquet SRC_PATH=./tpc-ds/data/sf10/csv DST_PATH=spark-benchmark/tpc-ds/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh
+MODE=parquet SRC_PATH=./tpc-ds/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh
 # 100Gi
 MODE=parquet SRC_PATH=./tpc-ds/data/sf100/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf100/parquet ./to-s3.sh
 # 300Gi

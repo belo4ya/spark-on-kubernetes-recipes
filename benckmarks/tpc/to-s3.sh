@@ -34,18 +34,18 @@ to_parquet() {
     --conf spark.sql.parquet.output.committer.class=org.apache.spark.internal.io.cloud.BindingParquetOutputCommitter \
     --conf spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version=2 \
     --conf spark.hadoop.mapreduce.fileoutputcommitter.cleanup-failures.ignored=true \
-    --conf parquet.hadoop.vectored.io.enabled=true \
+    --conf spark.hadoop.parquet.hadoop.vectored.io.enabled=true \
     --conf spark.hadoop.fs.s3a.fast.upload=true \
     --conf spark.hadoop.fs.s3a.fast.upload.buffer=disk \
     --conf spark.hadoop.fs.s3a.multipart.size=128m \
-    --conf spark.hadoop.fs.s3a.multipart.threshold=256m \
+    --conf spark.hadoop.fs.s3a.multipart.threshold=512m \
     --conf spark.hadoop.parquet.enable.summary-metadata=false \
     --conf spark.sql.parquet.mergeSchema=false \
     --conf spark.sql.parquet.filterPushdown=true \
     --conf spark.sql.hive.metastorePartitionPruning=true \
     --conf spark.hadoop.fs.s3a.experimental.input.fadvise=random \
     --conf spark.sql.parquet.compression.codec=zstd \
-    --conf parquet.compression.codec.zstd.level=19 \
+    --conf spark.hadoop.parquet.compression.codec.zstd.level=19 \
     ./to_parquet.py \
     --src="$SRC_PATH" \
     --dst="s3a://$PARQUET_DST_PATH" \
