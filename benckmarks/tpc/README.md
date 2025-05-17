@@ -39,6 +39,7 @@ SF=1000 PARALLEL=24 ./data.sh
 
 ```shell
 export BENCHMARK=tpc-h
+export SPARK_WORKERS=16
 
 # 10Gi
 MODE=csv-parquet SRC_PATH=./tpc-h/data/sf10/csv DST_PATH=spark-benchmark/tpc-h/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
@@ -56,7 +57,7 @@ MODE=parquet SRC_PATH=./tpc-h/data/sf1000/csv PARQUET_DST_PATH=spark-benchmark/t
 cd tpc-ds
 
 # 10Gi
-SF=100 PARALLEL=100 PART=10 ./data.sh && mv ./data/sf100 ./data/sf10
+SF=100 PARALLEL=200 PART=20 ./data.sh && mv ./data/sf100 ./data/sf10
 # 100Gi
 SF=100 PARALLEL=24 ./data.sh
 # 300Gi
@@ -67,6 +68,7 @@ SF=1000 PARALLEL=24 ./data.sh
 
 ```shell
 export BENCHMARK=tpc-ds
+export SPARK_WORKERS=16
 
 # 10Gi
 MODE=csv-parquet SRC_PATH=./tpc-ds/data/sf10/csv DST_PATH=spark-benchmark/tpc-ds/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh
