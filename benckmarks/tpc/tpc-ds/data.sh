@@ -20,8 +20,14 @@ pushd "$out_dir" > /dev/null || exit 1
 
 tables=$(ls *_*_[0-9]*.dat 2>/dev/null | sed -E 's/_[0-9]+_[0-9]+\.dat$//' | sort -u)
 for tbl in $tables; do
-  cat "${tbl}"_[0-9]*_[0-9]*.dat > "${tbl}.dat"
+  files=( "${tbl}"_[0-9]*_[0-9]*.dat )
+  IFS=$'\n' sorted=( $(printf '%s\n' "${files[@]}" | sort -t_ -k3,3n) )
+  unset IFS
+
+  cat "${sorted[@]}" > "${tbl}.dat"
   rm -f "${tbl}"_[0-9]*_[0-9]*.dat
+
+  echo "${tbl}.dat done"
 done
 
 popd > /dev/null || exit 1
