@@ -5,8 +5,8 @@ from pyspark.sql import SparkSession
 
 TPC_H_EXT = "tbl"
 TPC_H_TABLES = [
-    "customer",
     "lineitem",
+    "customer",
     "nation",
     "orders",
     "part",

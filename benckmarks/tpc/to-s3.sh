@@ -48,7 +48,7 @@ to_parquet() {
     --conf spark.sql.hive.metastorePartitionPruning=true \
     --conf spark.hadoop.fs.s3a.experimental.input.fadvise=random \
     --conf spark.sql.parquet.compression.codec=zstd \
-    --conf spark.hadoop.parquet.compression.codec.zstd.level=19 \
+    --conf spark.hadoop.parquet.compression.codec.zstd.level=9 \
     ./to_parquet.py \
     --src="$SRC_PATH" \
     --dst="s3a://$PARQUET_DST_PATH" \
