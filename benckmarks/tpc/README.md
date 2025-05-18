@@ -18,7 +18,7 @@ docker run -it -v ./spark-on-kubernetes-recipes:/opt/tpc-benchmark/spark-on-kube
 
 ```shell
 git clone https://github.com/belo4ya/spark-on-kubernetes-recipes.git
-
+docker run -it -v ./spark-on-kubernetes-recipes:/opt/tpc-benchmark/spark-on-kubernetes-recipes --name spark-tpc-benchmark-tools belo4ya/spark-tpc-benchmark-tools:tpc-h-v3.0.1-tpc-ds-v4.0.0
 cd spark-on-kubernetes-recipes/benckmarks/tpc/
 ```
 
@@ -39,7 +39,9 @@ SF=1000 PARALLEL=32 ./data.sh
 
 ```shell
 export BENCHMARK=tpc-h
-export SPARK_WORKERS=30
+export SPARK_CLUSTER='local-cluster[6,4,9216]'
+export SPARK_EXECUTOR_MEM='7680m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='1536m'
 
 # 10Gi
 MODE=parquet SRC_PATH=./tpc-h/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
@@ -68,7 +70,12 @@ SF=1000 PARALLEL=32 ./data.sh
 
 ```shell
 export BENCHMARK=tpc-ds
-export SPARK_WORKERS=30
+export SPARK_CLUSTER='local-cluster[6,4,9216]'
+export SPARK_EXECUTOR_MEM='7680m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='1536m'
+
+#Total Objects: 864
+#Total Size: 27.8 GiB
 
 # 10Gi
 MODE=parquet SRC_PATH=./tpc-ds/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh

@@ -4,10 +4,13 @@ set -x
 
 MODE=${MODE:-"csv"}
 BENCHMARK=${BENCHMARK:-"tpc-h"} # tpc-ds
-SPARK_WORKERS=${SPARK_WORKERS:-16}
 SRC_PATH=${SRC_PATH:-./tpc-h/data/sf1/csv}
 DST_PATH=${DST_PATH:-spark-benchmark/tpc-h/data/sf1/csv}
 PARQUET_DST_PATH=${PARQUET_DST_PATH:-spark-benchmark/tpc-h/data/sf1/parquet}
+
+SPARK_CLUSTER=${SPARK_CLUSTER:-"local-cluster[6,4,9216]"}
+SPARK_EXECUTOR_MEM=${SPARK_EXECUTOR_MEM:-7680m}
+SPARK_EXECUTOR_MEM_OVERHEAD=${SPARK_EXECUTOR_MEM_OVERHEAD:-1536m}
 
 upload_csv() {
   echo "Uploading CSV files to S3..."
@@ -17,9 +20,9 @@ upload_csv() {
 to_parquet() {
   echo "Converting CSV files to Parquet format..."
   /opt/spark/bin/spark-submit \
-    --master "local-cluster[$SPARK_WORKERS,1,2048]" \
-    --conf spark.executor.memory=1280m \
-    --conf spark.executor.memoryOverhead=512m \
+    --master "$SPARK_CLUSTER" \
+    --conf spark.executor.memory="$SPARK_EXECUTOR_MEM" \
+    --conf spark.executor.memoryOverhead="$SPARK_EXECUTOR_MEM_OVERHEAD" \
     --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem \
     --conf spark.hadoop.fs.s3a.access.key="$AWS_ACCESS_KEY_ID" \
     --conf spark.hadoop.fs.s3a.secret.key="$AWS_SECRET_ACCESS_KEY" \
