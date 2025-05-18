@@ -27,6 +27,8 @@ cd spark-on-kubernetes-recipes/benckmarks/tpc/
 ```shell
 cd tpc-h
 
+# 1Gi
+SF=1 PARALLEL=10 ./data.sh
 # 10Gi
 SF=10 PARALLEL=32 ./data.sh
 # 100Gi
@@ -38,19 +40,39 @@ SF=1000 PARALLEL=32 ./data.sh
 ```
 
 ```shell
-export BENCHMARK=tpc-h
-export SPARK_CLUSTER='local-cluster[6,4,9216]'
-export SPARK_EXECUTOR_MEM='7680m'
-export SPARK_EXECUTOR_MEM_OVERHEAD='1536m'
+export BENCH=tpc-h
+# local
+export SPARK_CLUSTER='local-cluster[4,2,2048]'
+export SPARK_EXECUTOR_MEM='1536m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='512m'
+# 32 CPU, 64 Gi
+export SPARK_CLUSTER='local-cluster[8,4,6144]'
+export SPARK_EXECUTOR_MEM='4864m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='1280m'
+# 24 CPU, 64 Gi
+export SPARK_CLUSTER='local-cluster[6,4,8192]'
+export SPARK_EXECUTOR_MEM='6912m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='1280m'
+
+# 1Gi
+MODE=chunks SRC_PATH=./tpc-h/data/sf1/chunks DST_PATH=./tpc-h/data/sf1/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-h/data/sf1/csv DST_PATH=s3a://spark-benchmark/tpc-h/data/sf1/parquet ./to-s3.sh
 
 # 10Gi
-MODE=parquet SRC_PATH=./tpc-h/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-h/data/sf10/chunks DST_PATH=./tpc-h/data/sf10/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-h/data/sf10/csv DST_PATH=s3a://spark-benchmark/tpc-h/data/sf10/parquet ./to-s3.sh
+
 # 100Gi
-MODE=parquet SRC_PATH=./tpc-h/data/sf100/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf100/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-h/data/sf100/chunks DST_PATH=./tpc-h/data/sf100/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-h/data/sf100/csv DST_PATH=s3a://spark-benchmark/tpc-h/data/sf100/parquet ./to-s3.sh
+
 # 300Gi
-MODE=parquet SRC_PATH=./tpc-h/data/sf300/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf300/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-h/data/sf300/chunks DST_PATH=./tpc-h/data/sf300/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-h/data/sf300/csv DST_PATH=s3a://spark-benchmark/tpc-h/data/sf300/parquet ./to-s3.sh
+
 # 1Ti
-MODE=parquet SRC_PATH=./tpc-h/data/sf1000/csv PARQUET_DST_PATH=spark-benchmark/tpc-h/data/sf1000/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-h/data/sf1000/chunks DST_PATH=./tpc-h/data/sf1000/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-h/data/sf1000/csv DST_PATH=s3a://spark-benchmark/tpc-h/data/sf1000/parquet ./to-s3.sh
 ```
 
 ## TPC-DS
@@ -58,6 +80,8 @@ MODE=parquet SRC_PATH=./tpc-h/data/sf1000/csv PARQUET_DST_PATH=spark-benchmark/t
 ```shell
 cd tpc-ds
 
+# 1Gi
+SF=100 PARALLEL=200 PART=2 ./data.sh && mv ./data/sf100 ./data/sf1
 # 10Gi
 SF=100 PARALLEL=200 PART=20 ./data.sh && mv ./data/sf100 ./data/sf10
 # 100Gi
@@ -69,20 +93,33 @@ SF=1000 PARALLEL=32 ./data.sh
 ```
 
 ```shell
-export BENCHMARK=tpc-ds
-export SPARK_CLUSTER='local-cluster[6,4,9216]'
-export SPARK_EXECUTOR_MEM='7680m'
-export SPARK_EXECUTOR_MEM_OVERHEAD='1536m'
+export BENCH=tpc-ds
+# 32 CPU, 64 Gi
+export SPARK_CLUSTER='local-cluster[8,4,6144]'
+export SPARK_EXECUTOR_MEM='4864m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='1280m'
+# 24 CPU, 64 Gi
+export SPARK_CLUSTER='local-cluster[6,4,8192]'
+export SPARK_EXECUTOR_MEM='6912m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='1280m'
 
-#Total Objects: 864
-#Total Size: 27.8 GiB
+# 1Gi
+MODE=chunks SRC_PATH=./tpc-ds/data/sf1/chunks DST_PATH=./tpc-ds/data/sf1/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-ds/data/sf1/csv DST_PATH=s3a://spark-benchmark/tpc-ds/data/sf1/parquet ./to-s3.sh
 
 # 10Gi
-MODE=parquet SRC_PATH=./tpc-ds/data/sf10/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-ds/data/sf10/chunks DST_PATH=./tpc-ds/data/sf10/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-ds/data/sf10/csv DST_PATH=s3a://spark-benchmark/tpc-ds/data/sf10/parquet ./to-s3.sh
+
 # 100Gi
-MODE=parquet SRC_PATH=./tpc-ds/data/sf100/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf100/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-ds/data/sf100/chunks DST_PATH=./tpc-ds/data/sf100/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-ds/data/sf100/csv DST_PATH=s3a://spark-benchmark/tpc-ds/data/sf100/parquet ./to-s3.sh
+
 # 300Gi
-MODE=parquet SRC_PATH=./tpc-ds/data/sf300/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf300/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-ds/data/sf300/chunks DST_PATH=./tpc-ds/data/sf300/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-ds/data/sf300/csv DST_PATH=s3a://spark-benchmark/tpc-ds/data/sf300/parquet ./to-s3.sh
+
 # 1Ti
-MODE=parquet SRC_PATH=./tpc-ds/data/sf1000/csv PARQUET_DST_PATH=spark-benchmark/tpc-ds/data/sf1000/parquet ./to-s3.sh
+MODE=chunks SRC_PATH=./tpc-ds/data/sf1000/chunks DST_PATH=./tpc-ds/data/sf1000/csv ./to-s3.sh \
+  && MODE=parquet SRC_PATH=./tpc-ds/data/sf1000/csv DST_PATH=s3a://spark-benchmark/tpc-ds/data/sf1000/parquet ./to-s3.sh
 ```

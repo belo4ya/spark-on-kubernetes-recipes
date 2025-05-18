@@ -1,24 +1,17 @@
 #!/usr/bin/env bash
-
+set -euo pipefail
 set -x
 
-MODE=${MODE:-"csv"}
-BENCHMARK=${BENCHMARK:-"tpc-h"} # tpc-ds
-SRC_PATH=${SRC_PATH:-./tpc-h/data/sf1/csv}
-DST_PATH=${DST_PATH:-spark-benchmark/tpc-h/data/sf1/csv}
-PARQUET_DST_PATH=${PARQUET_DST_PATH:-spark-benchmark/tpc-h/data/sf1/parquet}
+MODE=${MODE:-"chunks"} # csv, parquet
+BENCH=${BENCH:-"tpc-h"} # tpc-ds
+SRC_PATH=${SRC_PATH:-./tpc-h/data/sf1/chuncks}
+DST_PATH=${DST_PATH:-s3a://spark-benchmark/tpc-h/data/sf1/csv}
 
 SPARK_CLUSTER=${SPARK_CLUSTER:-"local-cluster[6,4,9216]"}
 SPARK_EXECUTOR_MEM=${SPARK_EXECUTOR_MEM:-7680m}
 SPARK_EXECUTOR_MEM_OVERHEAD=${SPARK_EXECUTOR_MEM_OVERHEAD:-1536m}
 
-upload_csv() {
-  echo "Uploading CSV files to S3..."
-  aws --endpoint-url="$AWS_ENDPOINT_URL" --no-verify-ssl s3 cp --recursive "$SRC_PATH/" "s3://$DST_PATH/"
-}
-
 to_parquet() {
-  echo "Converting CSV files to Parquet format..."
   /opt/spark/bin/spark-submit \
     --master "$SPARK_CLUSTER" \
     --conf spark.executor.memory="$SPARK_EXECUTOR_MEM" \
@@ -51,24 +44,9 @@ to_parquet() {
     --conf spark.hadoop.parquet.compression.codec.zstd.level=9 \
     ./to_parquet.py \
     --src="$SRC_PATH" \
-    --dst="s3a://$PARQUET_DST_PATH" \
-    --bench="$BENCHMARK"
+    --dst="$DST_PATH" \
+    --bench="$BENCH" \
+    --mode="$MODE"
 }
 
-case $MODE in
-  "csv")
-    upload_csv
-    ;;
-  "parquet")
-    to_parquet
-    ;;
-  "csv-parquet")
-    upload_csv
-    to_parquet
-    ;;
-  *)
-    echo "Invalid mode: $MODE"
-    echo "Supported modes: csv, parquet, csv-parquet"
-    exit 1
-    ;;
-esac
+to_parquet

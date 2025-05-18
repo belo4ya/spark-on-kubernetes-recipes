@@ -27,7 +27,7 @@ tables=( \
 
 for tbl in "${tables[@]}"; do
   mkdir -p "$tbl"
-  for f in "${tbl}"_*_*.dat; do
+  for f in "${tbl}"_[0-9]*_[0-9]*.dat; do
     [ -e "$f" ] && mv "$f" "$tbl/"
   done
   echo "$tbl done"
