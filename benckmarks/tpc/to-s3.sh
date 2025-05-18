@@ -40,7 +40,7 @@ to_parquet() {
     --conf spark.hadoop.fs.s3a.fast.upload.buffer=disk \
     --conf spark.hadoop.fs.s3a.multipart.size=128m \
     --conf spark.hadoop.fs.s3a.multipart.threshold=512m \
-    --conf spark.hadoop.parquet.enable.summary-metadata=false \
+    --conf spark.hadoop.parquet.summary.metadata.level=none \
     --conf spark.sql.parquet.mergeSchema=false \
     --conf spark.sql.parquet.filterPushdown=true \
     --conf spark.sql.hive.metastorePartitionPruning=true \
