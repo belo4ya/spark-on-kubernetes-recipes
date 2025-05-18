@@ -5,7 +5,7 @@ OUT_DIR=${OUT_DIR:-./data}
 SF=${SF:-1}
 PARALLEL=${PARALLEL:-8}
 
-out_dir="$OUT_DIR/sf$SF/csv"
+out_dir="$OUT_DIR/sf$SF/chunks"
 mkdir -p "$out_dir"
 pushd "$out_dir" > /dev/null || exit 1
 
@@ -16,15 +16,11 @@ done
 wait
 
 for tbl in customer orders lineitem part partsupp supplier nation region; do
-  if compgen -G "${tbl}.tbl.*" >/dev/null; then
-    files=( "${tbl}.tbl."* )
-    IFS=$'\n' sorted=( $(printf '%s\n' "${files[@]}" | sort -t. -k3,3n) )
-    unset IFS
-
-    cat "${sorted[@]}" > "${tbl}.tbl"
-    rm -f "${tbl}.tbl."*
-  fi
-  echo "${tbl}.tbl done"
+  mkdir -p "$tbl"
+  for f in "$tbl".tbl*; do
+    [ -e "$f" ] && mv "$f" "$tbl/"
+  done
+  echo "$tbl done"
 done
 
 popd > /dev/null || exit 1
