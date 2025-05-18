@@ -94,6 +94,10 @@ SF=1000 PARALLEL=32 ./data.sh
 
 ```shell
 export BENCH=tpc-ds
+# local
+export SPARK_CLUSTER='local-cluster[4,2,2048]'
+export SPARK_EXECUTOR_MEM='1536m'
+export SPARK_EXECUTOR_MEM_OVERHEAD='512m'
 # 32 CPU, 64 Gi
 export SPARK_CLUSTER='local-cluster[8,4,6144]'
 export SPARK_EXECUTOR_MEM='4864m'
