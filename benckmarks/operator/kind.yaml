@@ -14,8 +14,8 @@ nodes:
         kind: ClusterConfiguration
         controllerManager:
           extraArgs:
-            kube-api-qps: "1000" # <--QPS
-            kube-api-burst: "1000" # <--QPS
+            kube-api-qps: "2000" # <--QPS
+            kube-api-burst: "2000" # <--QPS
             node-monitor-grace-period: "7200s"
             node-monitor-period: "3600s"
             concurrent-job-syncs: "100"
@@ -24,11 +24,11 @@ nodes:
             extraArgs:
               quota-backend-bytes: "8589934592"
               auto-compaction-mode: revision
-              auto-compaction-retention: "1000"
+              auto-compaction-retention: "2000"
         scheduler:
           extraArgs:
-            kube-api-qps: "1000" # <--QPS
-            kube-api-burst: "1000" # <--QPS
+            kube-api-qps: "2000" # <--QPS
+            kube-api-burst: "2000" # <--QPS
         apiServer:
           extraArgs:
             max-mutating-requests-inflight: "20000"

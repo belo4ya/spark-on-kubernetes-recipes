@@ -1,0 +1,25 @@
+#global:
+#gc: true
+#measurements:
+#  - name: podLatency
+#  - name: jobLatency
+#  - name: pvcLatency
+
+#metricsEndpoints:
+#  - indexer:
+#      type: local
+
+jobs:
+  - name: jobs-throughput
+    namespace: spark-jobs
+    jobIterations: 1
+    qps: 100
+    burst: 100
+    waitWhenFinished: true
+    objects:
+      - objectTemplate: kubeflow.job.yaml.tmpl
+        replicas: 400
+        waitOptions:
+          customStatusPaths:
+            - key: ".applicationState.state"
+              value: "COMPLETED"

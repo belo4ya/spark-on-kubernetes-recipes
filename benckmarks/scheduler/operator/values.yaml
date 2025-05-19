@@ -1,0 +1,35 @@
+image:
+  #tag: 0.3.0-SNAPSHOT
+  #tag: main-snapshot
+  tag: 0.1.0
+
+operatorDeployment:
+  operatorPod:
+    tolerations:
+      - effect: "NoSchedule"
+        key: "spark-operator"
+        operator: "Exists"
+    operatorContainer:
+      resources:
+        limits:
+          cpu: "8"
+          ephemeral-storage: 4Gi
+          memory: 16Gi
+        requests:
+          cpu: "1"
+          ephemeral-storage: 2Gi
+          memory: 1Gi
+
+workloadResources:
+  namespaces:
+    create: false
+    overrideWatchedNamespaces: true
+    data:
+      - "default"
+      - "spark-jobs"
+
+operatorConfiguration:
+  spark-operator.properties: |+
+    spark.kubernetes.operator.reconciler.parallelism=30
+    spark.kubernetes.operator.reconciler.rateLimiter.maxLoopForPeriod=10
+    spark.kubernetes.operator.reconciler.rateLimiter.refreshPeriodSeconds=10

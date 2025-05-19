@@ -10,8 +10,15 @@ up: clean create-kind
 .PHONY: bench
 bench:
 	cd benchmark \
-		&& kube-burner init -c ${OPERATOR}.kube-burner.yaml --uuid=${OPERATOR} \
-		&& go run main.go -operator=${OPERATOR} -namespace=spark-jobs -label=spark-job
+		&& kube-burner init -c ${OPERATOR}.kube-burner.throughput.yaml --uuid=${OPERATOR} \
+		&& go run main.go -operator=${OPERATOR} -namespace=spark-jobs -label=spark-jobs \
+		&& mmv "results_${OPERATOR}_*.csv" "results_${OPERATOR}_throughput_#1.csv"
+	make clean-spark-jobs
+	cd benchmark \
+		&& kube-burner init -c ${OPERATOR}.kube-burner.latency.yaml --uuid=${OPERATOR} \
+		&& go run main.go -operator=${OPERATOR} -namespace=spark-jobs -label=spark-jobs \
+		&& mmv "results_${OPERATOR}_*.csv" "results_${OPERATOR}_latency_#1.csv"
+	make clean-spark-jobs
 
 .PHONY: clean
 clean:
@@ -66,6 +73,18 @@ create-operator-apache:
 create-fake-nodes:
 	helm upgrade --install fake-nodes kwok/fake-nodes --qps 5
 
+.PHONY: clean-spark-jobs
+clean-spark-jobs:
+ifeq ($(OPERATOR), kubeflow)
+	kubectl delete sparkapplications.sparkoperator.k8s.io --all -n spark-jobs
+else ifeq ($(OPERATOR), apache)
+	kubectl delete sparkapplications.spark.apache.org --all -n spark-jobs
+else
+	@echo "Error: OPERATOR must be set to 'kubeflow' or 'apache'"
+	@echo "Example: make create-operator OPERATOR=kubeflow"
+	@exit 1
+endif
+
 .PHONY: wait
 wait:
 	-for i in $$(seq 1 60); do \
@@ -73,3 +92,7 @@ wait:
 			--timeout=10s >/dev/null 2>&1 && break; \
 	done
 	sleep 1
+
+.PHONY: test
+test:
+	mmv "results_kubeflow_*.csv" "results_kubeflow_latency_#1.csv"

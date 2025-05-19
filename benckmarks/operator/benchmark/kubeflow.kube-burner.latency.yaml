@@ -10,16 +10,17 @@
 #      type: local
 
 jobs:
-  - name: create-jobs
+  - name: jobs-latency
     namespace: spark-jobs
-    jobIterations: 1
-    qps: 100
-    burst: 100
+    jobIterations: 100
+    qps: 10
+    burst: 10
     waitWhenFinished: true
+    jobIterationDelay: 1100ms
     objects:
-      - objectTemplate: apache.job.yaml.tmpl
-        replicas: 5000
+      - objectTemplate: kubeflow.job.yaml.tmpl
+        replicas: 1
         waitOptions:
           customStatusPaths:
-            - key: ".currentState.currentStateSummary"
-              value: "TerminatedWithoutReleaseResources"
+            - key: ".applicationState.state"
+              value: "COMPLETED"

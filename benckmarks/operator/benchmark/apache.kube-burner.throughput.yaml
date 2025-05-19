@@ -10,16 +10,16 @@
 #      type: local
 
 jobs:
-  - name: create-jobs
+  - name: jobs-throughput
     namespace: spark-jobs
     jobIterations: 1
     qps: 100
     burst: 100
     waitWhenFinished: true
     objects:
-      - objectTemplate: kubeflow.job.yaml.tmpl
-        replicas: 10
+      - objectTemplate: apache.job.yaml.tmpl
+        replicas: 8000
         waitOptions:
           customStatusPaths:
-            - key: ".applicationState.state"
-              value: "COMPLETED"
+            - key: ".currentState.currentStateSummary"
+              value: "TerminatedWithoutReleaseResources"
