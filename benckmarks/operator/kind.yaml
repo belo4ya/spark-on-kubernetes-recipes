@@ -1,0 +1,40 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: v31
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.31.6
+    kubeadmConfigPatches:
+      - |-
+        kind: ClusterConfiguration
+        controllerManager:
+          extraArgs:
+            kube-api-qps: "1000" # <--QPS
+            kube-api-burst: "1000" # <--QPS
+            node-monitor-grace-period: "7200s"
+            node-monitor-period: "3600s"
+            concurrent-job-syncs: "100"
+        etcd:
+          local:
+            extraArgs:
+              quota-backend-bytes: "8589934592"
+              auto-compaction-mode: revision
+              auto-compaction-retention: "1000"
+        scheduler:
+          extraArgs:
+            kube-api-qps: "1000" # <--QPS
+            kube-api-burst: "1000" # <--QPS
+        apiServer:
+          extraArgs:
+            max-mutating-requests-inflight: "20000"
+            max-requests-inflight: "20000"
+  - role: worker
+    image: kindest/node:v1.31.6
+    kubeadmConfigPatches:
+      - |-
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            register-with-taints: "spark-operator=true:NoSchedule"
+  - role: worker
+    image: kindest/node:v1.31.6

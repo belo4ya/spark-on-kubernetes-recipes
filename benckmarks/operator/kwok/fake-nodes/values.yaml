@@ -1,0 +1,20 @@
+# Node type definitions
+nodeTypes:
+  data-plane.spark:
+    role: "data-plane.spark"
+    resources:
+      cpu: "64"
+      memory: "256Gi"
+      pods: "110"
+    annotations: {}
+    labels: {}
+    taints: []
+    conditions: []
+    images: []
+
+# Node definitions
+nodes:
+  - type: "data-plane.spark"
+    count: 300
+    namePrefix: "spark"
+    nameSuffix: ""

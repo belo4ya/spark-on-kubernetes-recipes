@@ -1,0 +1,31 @@
+controller:
+  tolerations:
+    - effect: "NoSchedule"
+      key: "spark-operator"
+      operator: "Exists"
+  resources:
+    limits:
+      cpu: "8"
+      memory: 16Gi
+    requests:
+      cpu: "1"
+      memory: 1Gi
+  workers: 30
+  workqueueRateLimiter:
+    bucketQPS: 100
+    bucketSize: 1000
+
+webhook:
+  tolerations:
+    - effect: "NoSchedule"
+      key: "spark-operator"
+      operator: "Exists"
+
+spark:
+  jobNamespaces:
+    - "default"
+    - "spark-jobs"
+
+prometheus:
+  metrics:
+    enable: false

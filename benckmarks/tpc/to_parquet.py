@@ -752,7 +752,7 @@ def to_parquet(spark: SparkSession, src: str, dst: str, benchmark: BenchmarkT) -
         )
         df = df.drop(df.columns[-1])
         df.write.mode("overwrite").parquet(f"{dst}/{table}")
-        print(f"[to_parquet][{i:02}/{len(table):02}] {table}")
+        print(f"[to_parquet][{i+1:02}/{len(tables):02}] {table}")
 
 
 def main() -> None:

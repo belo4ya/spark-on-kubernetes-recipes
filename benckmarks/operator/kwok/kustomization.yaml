@@ -1,0 +1,10 @@
+resources:
+  - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+  - https://github.com/kubernetes-sigs/kwok/releases/download/v0.7.0/kwok.yaml
+  - https://github.com/kubernetes-sigs/kwok/releases/download/v0.7.0/stage-fast.yaml
+  - https://github.com/kubernetes-sigs/kwok/releases/download/v0.7.0/metrics-usage.yaml
+
+patches:
+  - path: patch.metrics-server.yaml
+  - path: patch.kwok-cm.yaml
+  - path: patch.kwok-stage-pod-complete.yaml
