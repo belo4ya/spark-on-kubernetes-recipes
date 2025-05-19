@@ -1,0 +1,37 @@
+apiVersion: spark.apache.org/v1alpha1
+kind: SparkApplication
+metadata:
+  name: "pi-{{ .Replica }}"
+  namespace: "spark-jobs"
+spec:
+  mainClass: "org.apache.spark.examples.SparkPi"
+  jars: "local:///opt/spark/examples/jars/spark-examples.jar"
+  runtimeVersions:
+    scalaVersion: "2.13"
+    sparkVersion: "3.5.5"
+  applicationTolerations:
+    resourceRetainPolicy: Always
+  sparkConf:
+    spark.kubernetes.authenticate.driver.serviceAccountName: "spark"
+    spark.kubernetes.container.image: "apache/spark:3.5.5"
+    spark.executor.instances: "1"
+    spark.driver.cores: "1"
+    spark.driver.memory: "512m"
+
+  driverSpec:
+    podTemplateSpec:
+      metadata:
+        labels:
+          "pod-complete.stage.kwok.x-k8s.io/completed": "true"
+          "kube-burner-job": "{{ .JobName }}"
+          "kube-burner-runid": "{{ .RunID }}"
+          "kube-burner-uuid": "{{ .UUID }}"
+          "kube-burner.io/job-iteration": "{{ .Iteration }}"
+          "kube-burner.io/replica": "{{ .Replica }}"
+      spec:
+        nodeSelector:
+          type: "kwok"
+        tolerations:
+          - effect: "NoSchedule"
+            key: "kwok.x-k8s.io/node"
+            operator: "Exists"
