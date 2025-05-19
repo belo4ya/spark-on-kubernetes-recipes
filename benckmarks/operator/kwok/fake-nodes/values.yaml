@@ -15,6 +15,6 @@ nodeTypes:
 # Node definitions
 nodes:
   - type: "data-plane.spark"
-    count: 300
+    count: 5
     namePrefix: "spark"
     nameSuffix: ""

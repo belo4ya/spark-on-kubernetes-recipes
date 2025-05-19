@@ -20,7 +20,7 @@ operatorDeployment:
 
 workloadResources:
   namespaces:
-    create: true
+    create: false
     overrideWatchedNamespaces: true
     data:
       - "default"

@@ -4,6 +4,9 @@ name: v31
 nodes:
   - role: control-plane
     image: kindest/node:v1.31.6
+    extraMounts:
+      - hostPath: ./kube-prometheus-stack/data
+        containerPath: /data/prometheus
     kubeadmConfigPatches:
       - |-
         kind: ClusterConfiguration
@@ -38,3 +41,6 @@ nodes:
             register-with-taints: "spark-operator=true:NoSchedule"
   - role: worker
     image: kindest/node:v1.31.6
+    extraMounts:
+      - hostPath: ./kube-prometheus-stack/data
+        containerPath: /data/prometheus

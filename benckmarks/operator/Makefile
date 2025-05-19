@@ -5,6 +5,7 @@ OPERATOR ?= apache
 up: clean create-kind
 	make wait
 	make -j 3 create-kwok create-monitoring create-operator
+	make create-fake-nodes
 
 .PHONY: clean
 clean:
@@ -20,10 +21,10 @@ create-kwok:
 
 .PHONY: create-monitoring
 create-monitoring:
-	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+	kustomize build kube-prometheus-stack/ | kubectl create -f -
+	helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version=72.5.0 \
       -n monitoring --create-namespace \
-      --set alertmanager.enabled=false \
-      --set kubeStateMetrics.enabled=false
+      -f kube-prometheus-stack/values.yaml
 
 .PHONY: create-operator
 create-operator:
@@ -39,16 +40,21 @@ endif
 
 .PHONY: create-operator-kubeflow
 create-operator-kubeflow:
-	kubectl create ns spark-jobs
-	helm install kubeflow-spark-operator spark-operator/spark-operator --version=2.1.1 \
+	kubectl create ns spark-jobs || true
+	helm upgrade --install kubeflow-spark-operator spark-operator/spark-operator --version=2.1.1 \
 		-n spark-operator --create-namespace \
 		-f kubeflow/values.yaml
 
 .PHONY: create-operator-apache
 create-operator-apache:
-	helm install spark-kubernetes-operator spark-kubernetes-operator/spark-kubernetes-operator --version=0.1.0 \
+	kubectl create ns spark-jobs || true
+	helm upgrade --install spark-kubernetes-operator spark-kubernetes-operator/spark-kubernetes-operator --version=0.1.0 \
 		-n spark-operator --create-namespace \
 		-f apache/values.yaml
+
+.PHONY: create-fake-nodes
+create-fake-nodes:
+	helm upgrade --install fake-nodes kwok/fake-nodes --qps 5
 
 .PHONY: wait
 wait:
