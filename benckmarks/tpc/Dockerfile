@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     bison \
     flex \
+    byacc \
+    dos2unix \
+    maven \
     unzip \
     wget \
     awscli \
@@ -33,8 +36,7 @@ ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ENV S3_BUCKET=${S3_BUCKET}
 
 # TPC-H
-RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
-           s3 cp s3://${S3_BUCKET}/tpc-h/tpc-h-tool-v3.0.1.zip . \
+RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl s3 cp s3://${S3_BUCKET}/tpc-h/tpc-h-tool-v3.0.1.zip . \
     && unzip tpc-h-tool-v3.0.1.zip \
     && rm -f tpc-h-tool-v3.0.1.zip \
     && cd tpc-h-tool-v3.0.1/dbgen \
@@ -42,13 +44,13 @@ RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
     && chmod +x dbgen qgen \
     && cp qgen dbgen /usr/local/bin/
 
-ENV TPCH_DISTS_DSS=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/dists.dss
-ENV TPCH_DSS_QUERY=/opt/tpc-benchmark/tpc-h-tool-v3.0.1/dbgen/queries
+ENV TPCH_HOME=/opt/tpc-benchmark/tpc-h-tool-v3.0.1
+ENV TPCH_DISTS_DSS=${TPCH_HOME}/dbgen/dists.dss
+ENV TPCH_DSS_QUERY=${TPCH_HOME}/dbgen/queries
 ENV DSS_QUERY=${TPCH_DSS_QUERY}
 
 # TPC-DS
-RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
-           s3 cp s3://${S3_BUCKET}/tpc-ds/tpc-ds-tool-v4.0.0.zip . \
+RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl s3 cp s3://${S3_BUCKET}/tpc-ds/tpc-ds-tool-v4.0.0.zip . \
     && unzip tpc-ds-tool-v4.0.0.zip \
     && rm -f tpc-ds-tool-v4.0.0.zip \
     && cd tpc-ds-tool-v4.0.0/tools \
@@ -56,6 +58,14 @@ RUN aws --endpoint-url=${AWS_ENDPOINT_URL} --no-verify-ssl \
     && chmod +x dsdgen dsqgen \
     && cp dsdgen dsqgen /usr/local/bin/
 
-ENV TPCDS_DISTRIBUTIONS=/opt/tpc-benchmark/tpc-ds-tool-v4.0.0/tools/tpcds.idx
+ENV TPCDS_HOME=/opt/tpc-benchmark/tpc-ds-tool-v4.0.0
+ENV TPCDS_DISTRIBUTIONS=${TPCDS_HOME}/tools/tpcds.idx
+
+# NVIDIA/spark-rapids-benchmarks
+RUN git clone https://github.com/NVIDIA/spark-rapids-benchmarks.git \
+    && cd spark-rapids-benchmarks/nds/tpcds-gen \
+    && make clean all LINUX_CC='gcc -fcommon'  \
+    && cd ../../nds-h/tpch-gen  \
+    && make
 
 ENTRYPOINT ["/bin/bash"]

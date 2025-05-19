@@ -2,14 +2,19 @@
 set -euo pipefail
 set -x
 
-MODE=${MODE:-"chunks"} # csv, parquet
+MODE=${MODE:-"csv"} # parquet, csv-parquet
 BENCH=${BENCH:-"tpc-h"} # tpc-ds
-SRC_PATH=${SRC_PATH:-./tpc-h/data/sf1/chuncks}
-DST_PATH=${DST_PATH:-s3a://spark-benchmark/tpc-h/data/sf1/csv}
+SRC_PATH=${SRC_PATH:-./tpc-h/data/sf1/csv}
+DST_PATH=${DST_PATH:-spark-benchmark/tpc-h/data/sf1/csv}
+PARQUET_DST_PATH=${PARQUET_DST_PATH:-spark-benchmark/tpc-h/data/sf1/parquet}
 
 SPARK_CLUSTER=${SPARK_CLUSTER:-"local-cluster[6,4,9216]"}
 SPARK_EXECUTOR_MEM=${SPARK_EXECUTOR_MEM:-7680m}
 SPARK_EXECUTOR_MEM_OVERHEAD=${SPARK_EXECUTOR_MEM_OVERHEAD:-1536m}
+
+upload_csv() {
+  aws --endpoint-url="$AWS_ENDPOINT_URL" --no-verify-ssl s3 cp --recursive "$SRC_PATH/" "s3://$DST_PATH/"
+}
 
 to_parquet() {
   export AWS_JAVA_V1_DISABLE_DEPRECATION_ANNOUNCEMENT=true
@@ -50,9 +55,24 @@ to_parquet() {
     --conf spark.sql.legacy.charVarcharAsString=true \
     ./to_parquet.py \
     --src="$SRC_PATH" \
-    --dst="$DST_PATH" \
-    --bench="$BENCH" \
-    --mode="$MODE"
+    --dst="s3a://$PARQUET_DST_PATH" \
+    --bench="$BENCH"
 }
 
-to_parquet
+case $MODE in
+  "csv")
+    upload_csv
+    ;;
+  "parquet")
+    to_parquet
+    ;;
+  "csv-parquet")
+    upload_csv
+    to_parquet
+    ;;
+  *)
+    echo "Invalid mode: $MODE"
+    echo "Supported modes: csv, parquet, csv-parquet"
+    exit 1
+    ;;
+esac
