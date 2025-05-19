@@ -1,8 +1,10 @@
 apiVersion: sparkoperator.k8s.io/v1beta2
 kind: SparkApplication
 metadata:
-  name: "pi-{{ .Index }}"
-  namespace: "kubeflow-jobs"
+  name: "pi-{{ .Replica }}"
+  namespace: "spark-jobs"
+  labels:
+    spark-jobs: "true"
 spec:
   type: Scala
   mode: cluster
@@ -14,9 +16,15 @@ spec:
   driver:
     cores: 1
     memory: 512m
-    serviceAccount: kubeflow-jobs-operator-spark
+    serviceAccount: kubeflow-spark-operator-spark
     labels:
       "pod-complete.stage.kwok.x-k8s.io/completed": "true"
+      "spark-jobs": "true"
+      "kube-burner-job": "{{ .JobName }}"
+      "kube-burner-runid": "{{ .RunID }}"
+      "kube-burner-uuid": "{{ .UUID }}"
+      "kube-burner.io/job-iteration": "{{ .Iteration }}"
+      "kube-burner.io/replica": "{{ .Replica }}"
     nodeSelector:
       type: "kwok"
     tolerations:

@@ -1,0 +1,25 @@
+#global:
+#gc: true
+#measurements:
+#  - name: podLatency
+#  - name: jobLatency
+#  - name: pvcLatency
+
+#metricsEndpoints:
+#  - indexer:
+#      type: local
+
+jobs:
+  - name: create-jobs
+    namespace: spark-jobs
+    jobIterations: 1
+    qps: 100
+    burst: 100
+    waitWhenFinished: true
+    objects:
+      - objectTemplate: apache.job.yaml.tmpl
+        replicas: 5000
+        waitOptions:
+          customStatusPaths:
+            - key: ".currentState.currentStateSummary"
+              value: "TerminatedWithoutReleaseResources"

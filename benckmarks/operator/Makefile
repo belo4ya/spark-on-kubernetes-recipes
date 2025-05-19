@@ -7,6 +7,12 @@ up: clean create-kind
 	make -j 3 create-kwok create-monitoring create-operator
 	make create-fake-nodes
 
+.PHONY: bench
+bench:
+	cd benchmark \
+		&& kube-burner init -c ${OPERATOR}.kube-burner.yaml --uuid=${OPERATOR} \
+		&& go run main.go -operator=${OPERATOR} -namespace=spark-jobs -label=spark-job
+
 .PHONY: clean
 clean:
 	kind delete clusters v31

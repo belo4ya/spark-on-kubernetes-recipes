@@ -3,6 +3,8 @@ kind: SparkApplication
 metadata:
   name: "pi-{{ .Replica }}"
   namespace: "spark-jobs"
+  labels:
+    spark-jobs: "true"
 spec:
   mainClass: "org.apache.spark.examples.SparkPi"
   jars: "local:///opt/spark/examples/jars/spark-examples.jar"
@@ -10,7 +12,7 @@ spec:
     scalaVersion: "2.13"
     sparkVersion: "3.5.5"
   applicationTolerations:
-    resourceRetainPolicy: Always
+    resourceRetainPolicy: "Always"
   sparkConf:
     spark.kubernetes.authenticate.driver.serviceAccountName: "spark"
     spark.kubernetes.container.image: "apache/spark:3.5.5"
@@ -23,6 +25,7 @@ spec:
       metadata:
         labels:
           "pod-complete.stage.kwok.x-k8s.io/completed": "true"
+          "spark-jobs": "true"
           "kube-burner-job": "{{ .JobName }}"
           "kube-burner-runid": "{{ .RunID }}"
           "kube-burner-uuid": "{{ .UUID }}"

@@ -1,13 +1,13 @@
-global:
+#global:
 #gc: true
 #measurements:
 #  - name: podLatency
 #  - name: jobLatency
 #  - name: pvcLatency
 
-metricsEndpoints:
-  - indexer:
-      type: local
+#metricsEndpoints:
+#  - indexer:
+#      type: local
 
 jobs:
   - name: create-jobs
@@ -17,9 +17,9 @@ jobs:
     burst: 100
     waitWhenFinished: true
     objects:
-      - objectTemplate: apache.yaml.tmpl
-        replicas: 5000
+      - objectTemplate: kubeflow.job.yaml.tmpl
+        replicas: 10
         waitOptions:
           customStatusPaths:
-            - key: ".currentState.currentStateSummary"
-              value: "TerminatedWithoutReleaseResources"
+            - key: ".applicationState.state"
+              value: "COMPLETED"
