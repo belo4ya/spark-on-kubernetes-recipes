@@ -5,8 +5,10 @@ nodes:
   - role: control-plane
     image: kindest/node:v1.31.6
     extraMounts:
-      - hostPath: ./kube-prometheus-stack/data
+      - hostPath: ./kube-prometheus-stack/data/prometheus
         containerPath: /data/prometheus
+      - hostPath: ./kube-prometheus-stack/data/grafana
+        containerPath: /var/lib/grafana
     kubeadmConfigPatches:
       - |-
         kind: ClusterConfiguration
@@ -42,5 +44,7 @@ nodes:
   - role: worker
     image: kindest/node:v1.31.6
     extraMounts:
-      - hostPath: ./kube-prometheus-stack/data
+      - hostPath: ./kube-prometheus-stack/data/prometheus
         containerPath: /data/prometheus
+      - hostPath: ./kube-prometheus-stack/data/grafana
+        containerPath: /var/lib/grafana

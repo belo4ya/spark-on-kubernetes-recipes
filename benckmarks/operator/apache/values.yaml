@@ -1,5 +1,6 @@
 image:
-  tag: 0.3.0-SNAPSHOT
+  #tag: 0.3.0-SNAPSHOT
+  tag: main-snapshot
 
 operatorDeployment:
   operatorPod:

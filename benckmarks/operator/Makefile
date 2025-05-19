@@ -14,6 +14,8 @@ clean:
 .PHONY: create-kind
 create-kind:
 	kind create cluster --config kind.yaml && kubectx kind-v31
+	kubectl patch daemonset -n kube-system kindnet --type=json -p '[{"op":"remove","path":"/spec/template/spec/containers/0/resources"}]'
+	kubectl patch daemonset -n kube-system kube-proxy --type=json -p '[{"op":"add","path":"/spec/template/spec/affinity","value":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"type","operator":"NotIn","values":["kwok"]}]}]}}}}]'
 
 .PHONY: create-kwok
 create-kwok:
@@ -21,10 +23,12 @@ create-kwok:
 
 .PHONY: create-monitoring
 create-monitoring:
-	kustomize build kube-prometheus-stack/ | kubectl create -f -
+	kustomize build kube-prometheus-stack/ | kubectl create -f - || true
 	helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version=72.5.0 \
       -n monitoring --create-namespace \
       -f kube-prometheus-stack/values.yaml
+	kubectl patch daemonset -n monitoring kube-prometheus-stack-prometheus-node-exporter --type=json -p '[{"op":"add","path":"/spec/template/spec/affinity","value":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"type","operator":"NotIn","values":["kwok"]}]}]}}}}]'
+
 
 .PHONY: create-operator
 create-operator:

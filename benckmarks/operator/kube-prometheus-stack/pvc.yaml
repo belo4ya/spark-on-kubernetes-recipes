@@ -11,3 +11,19 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /data/prometheus
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-data
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/lib/grafana
+    type: DirectoryOrCreate

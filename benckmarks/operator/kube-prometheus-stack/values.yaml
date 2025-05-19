@@ -1,7 +1,12 @@
+alertmanager:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+
 prometheus:
   prometheusSpec:
-    retention: 90d
-    retentionSize: 18Gi
+    retention: "90d"
+    retentionSize: "18GiB"
     storageSpec:
       volumeClaimTemplate:
         metadata:
@@ -14,7 +19,13 @@ prometheus:
             requests:
               storage: 20Gi
 
-alertmanager:
-  enabled: false
-kubeStateMetrics:
-  enabled: false
+grafana:
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: standard
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+    finalizers:
+      - kubernetes.io/pvc-protection
