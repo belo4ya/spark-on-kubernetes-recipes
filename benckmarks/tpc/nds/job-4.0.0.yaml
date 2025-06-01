@@ -1,0 +1,19 @@
+apiVersion: spark.apache.org/v1alpha1
+kind: SparkApplication
+metadata:
+  name: nds-4.0.0
+spec:
+  applicationTolerations:
+    resourceRetainPolicy: Always
+  runtimeVersions:
+    sparkVersion: "4.0.0"
+
+  pyFiles: "s3a://opt/spark/examples/src/main/python/pi.py"
+  jars: ""
+  files: ""
+  mainClass: ""
+  sparkConf:
+    spark.kubernetes.container.image: "apache/spark:4.0.0"
+    spark.kubernetes.authenticate.driver.serviceAccountName: "spark"
+
+    spark.submit.pyFiles: ""

@@ -65,7 +65,7 @@ create-operator-kubeflow:
 .PHONY: create-operator-apache
 create-operator-apache:
 	kubectl create ns spark-jobs || true
-	helm upgrade --install spark-kubernetes-operator spark-kubernetes-operator/spark-kubernetes-operator --version=0.1.0 \
+	helm upgrade --install spark-kubernetes-operator spark-kubernetes-operator/spark-kubernetes-operator --version=1.0.0 \
 		-n spark-operator --create-namespace \
 		-f apache/values.yaml
 
