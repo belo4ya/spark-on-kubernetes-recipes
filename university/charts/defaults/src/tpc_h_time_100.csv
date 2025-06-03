@@ -1,0 +1,37 @@
+application_id,query,time/milliseconds
+nds-h-355-0,CreateTempView part,9938
+nds-h-355-0,CreateTempView supplier,3758
+nds-h-355-0,CreateTempView partsupp,3559
+nds-h-355-0,CreateTempView customer,514
+nds-h-355-0,CreateTempView orders,523
+nds-h-355-0,CreateTempView lineitem,677
+nds-h-355-0,CreateTempView nation,386
+nds-h-355-0,CreateTempView region,432
+nds-h-355-0,query21,110363
+nds-h-355-0,query3,32036
+nds-h-355-0,query18,78707
+nds-h-355-0,query5,51364
+nds-h-355-0,query11,9576
+nds-h-355-0,query7,23189
+nds-h-355-0,query6,7709
+nds-h-355-0,query20,18081
+nds-h-355-0,query17,72355
+nds-h-355-0,query12,18476
+nds-h-355-0,query16,12756
+nds-h-355-0,query15_part1,96
+nds-h-355-0,query15_part2,23674
+nds-h-355-0,query15_part3,22
+nds-h-355-0,query13,27538
+nds-h-355-0,query10,26544
+nds-h-355-0,query2,12711
+nds-h-355-0,query8,59059
+nds-h-355-0,query14,10766
+nds-h-355-0,query19,11799
+nds-h-355-0,query9,94654
+nds-h-355-0,query22,10865
+nds-h-355-0,query1,64335
+nds-h-355-0,query4,18815
+nds-h-355-0,Power Start Time,1748827229
+nds-h-355-0,Power End Time,1748828025
+nds-h-355-0,Power Test Time,796000
+nds-h-355-0,Total Time,826278

@@ -1,0 +1,132 @@
+application_id,query,time/milliseconds
+nds-355-0,CreateTempView customer_address,8462
+nds-355-0,CreateTempView customer_demographics,3912
+nds-355-0,CreateTempView date_dim,563
+nds-355-0,CreateTempView warehouse,516
+nds-355-0,CreateTempView ship_mode,374
+nds-355-0,CreateTempView time_dim,489
+nds-355-0,CreateTempView reason,552
+nds-355-0,CreateTempView income_band,3903
+nds-355-0,CreateTempView item,688
+nds-355-0,CreateTempView store,3802
+nds-355-0,CreateTempView call_center,3255
+nds-355-0,CreateTempView customer,3037
+nds-355-0,CreateTempView web_site,519
+nds-355-0,CreateTempView store_returns,398
+nds-355-0,CreateTempView household_demographics,2915
+nds-355-0,CreateTempView web_page,290
+nds-355-0,CreateTempView promotion,2844
+nds-355-0,CreateTempView catalog_page,2916
+nds-355-0,CreateTempView inventory,2902
+nds-355-0,CreateTempView catalog_returns,378
+nds-355-0,CreateTempView web_returns,358
+nds-355-0,CreateTempView web_sales,335
+nds-355-0,CreateTempView catalog_sales,2857
+nds-355-0,CreateTempView store_sales,405
+nds-355-0,query96,12483
+nds-355-0,query7,6416
+nds-355-0,query75,14919
+nds-355-0,query44,1613
+nds-355-0,query39_part1,3627
+nds-355-0,query39_part2,2819
+nds-355-0,query80,17511
+nds-355-0,query32,2208
+nds-355-0,query19,2920
+nds-355-0,query25,10784
+nds-355-0,query78,13258
+nds-355-0,query86,2684
+nds-355-0,query1,2416
+nds-355-0,query91,1864
+nds-355-0,query21,2029
+nds-355-0,query43,1980
+nds-355-0,query27,3137
+nds-355-0,query94,6177
+nds-355-0,query45,3209
+nds-355-0,query58,4107
+nds-355-0,query64,14002
+nds-355-0,query36,3327
+nds-355-0,query33,4086
+nds-355-0,query46,2816
+nds-355-0,query62,2971
+nds-355-0,query16,5257
+nds-355-0,query10,3338
+nds-355-0,query63,3130
+nds-355-0,query69,2235
+nds-355-0,query60,4124
+nds-355-0,query59,5470
+nds-355-0,query37,1843
+nds-355-0,query98,3936
+nds-355-0,query85,3204
+nds-355-0,query70,3380
+nds-355-0,query67,13181
+nds-355-0,query28,4822
+nds-355-0,query81,1299
+nds-355-0,query97,2910
+nds-355-0,query66,3703
+nds-355-0,query90,1411
+nds-355-0,query17,8562
+nds-355-0,query47,6882
+nds-355-0,query95,11284
+nds-355-0,query92,1879
+nds-355-0,query3,1571
+nds-355-0,query51,16137
+nds-355-0,query35,2439
+nds-355-0,query49,4445
+nds-355-0,query9,3076
+nds-355-0,query31,4844
+nds-355-0,query11,5264
+nds-355-0,query93,5521
+nds-355-0,query29,8585
+nds-355-0,query38,2150
+nds-355-0,query22,2549
+nds-355-0,query89,2339
+nds-355-0,query15,1890
+nds-355-0,query6,2401
+nds-355-0,query52,1382
+nds-355-0,query50,4824
+nds-355-0,query42,1414
+nds-355-0,query41,1486
+nds-355-0,query8,2500
+nds-355-0,query12,2372
+nds-355-0,query20,2499
+nds-355-0,query88,6338
+nds-355-0,query82,1794
+nds-355-0,query23_part1,10655
+nds-355-0,query23_part2,10844
+nds-355-0,query14_part1,4384
+nds-355-0,query14_part2,2914
+nds-355-0,query57,2013
+nds-355-0,query65,6755
+nds-355-0,query71,3404
+nds-355-0,query34,2459
+nds-355-0,query48,2515
+nds-355-0,query30,2163
+nds-355-0,query74,3852
+nds-355-0,query87,3357
+nds-355-0,query77,3142
+nds-355-0,query73,1739
+nds-355-0,query84,1224
+nds-355-0,query54,3757
+nds-355-0,query55,1454
+nds-355-0,query56,3020
+nds-355-0,query2,3345
+nds-355-0,query26,2041
+nds-355-0,query40,4033
+nds-355-0,query72,13438
+nds-355-0,query53,2061
+nds-355-0,query79,2333
+nds-355-0,query18,2302
+nds-355-0,query13,2448
+nds-355-0,query24_part1,6329
+nds-355-0,query24_part2,4545
+nds-355-0,query4,5009
+nds-355-0,query99,1955
+nds-355-0,query68,2314
+nds-355-0,query83,2059
+nds-355-0,query61,3863
+nds-355-0,query5,4984
+nds-355-0,query76,2739
+nds-355-0,Power Start Time,1748828139
+nds-355-0,Power End Time,1748828599
+nds-355-0,Power Test Time,460000
+nds-355-0,Total Time,518477
