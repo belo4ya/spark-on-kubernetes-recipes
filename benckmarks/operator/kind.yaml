@@ -48,3 +48,5 @@ nodes:
         containerPath: /data/prometheus
       - hostPath: ./kube-prometheus-stack/data/grafana
         containerPath: /var/lib/grafana
+      - hostPath: ../tpc/nds/results
+        containerPath: /mnt/benchmark-results

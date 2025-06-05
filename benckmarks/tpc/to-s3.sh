@@ -76,3 +76,18 @@ case $MODE in
     exit 1
     ;;
 esac
+
+./spark-submit-template /opt/tpc-benchmark/spark-on-kubernetes-recipes/benckmarks/tpc/spark-rapids-benchmarks/nds/power_run_cpu2.template \
+  nds_power.py \
+  s3a://spark-benchmark/tpc-ds/data/sf10/parquet \
+  ./query_streams/query_0.sql \
+  time.csv \
+  --property_file /opt/tpc-benchmark/spark-on-kubernetes-recipes/benckmarks/tpc/spark-rapids-benchmarks/nds/properties/local.properties
+
+./spark-submit-template /opt/tpc-benchmark/spark-on-kubernetes-recipes/benckmarks/tpc/spark-rapids-benchmarks/nds/power_run_cpu2.template \
+  ../nds-h/nds_h_power.py \
+  s3a://spark-benchmark/tpc-h/data/sf10/parquet \
+  /opt/tpc-benchmark/spark-on-kubernetes-recipes/benckmarks/tpc/nds-h/query_streams/stream_1.sql \
+  tpch_time.csv \
+  --property_file /opt/tpc-benchmark/spark-on-kubernetes-recipes/benckmarks/tpc/spark-rapids-benchmarks/nds/properties/local.properties \
+  --json_summary_folder summary
